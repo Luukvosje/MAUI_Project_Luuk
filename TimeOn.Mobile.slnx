@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/TimeOn.Mobile.Api/TimeOn.Mobile.Api.csproj" />
     <Project Path="src/TimeOn.Mobile.App/TimeOn.Mobile.App.csproj" />
     <Project Path="src/TimeOn.Mobile.Core/TimeOn.Mobile.Core.csproj" />
     <Project Path="src/TimeOn.Mobile.Infrastructure/TimeOn.Mobile.Infrastructure.csproj" />

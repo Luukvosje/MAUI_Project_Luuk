@@ -5,12 +5,14 @@ namespace TimeOn.Mobile.Infrastructure.Api;
 
 public sealed class AuthService : IAuthService
 {
+    private readonly ApiClient apiClient;
     private readonly JwtTokenStore tokenStore;
     private readonly IKeyValueStore keyValueStore;
     private const string TokenKey = "auth_token";
 
-    public AuthService(JwtTokenStore tokenStore, IKeyValueStore keyValueStore)
+    public AuthService(ApiClient apiClient, JwtTokenStore tokenStore, IKeyValueStore keyValueStore)
     {
+        this.apiClient = apiClient;
         this.tokenStore = tokenStore;
         this.keyValueStore = keyValueStore;
     }
@@ -22,7 +24,25 @@ public sealed class AuthService : IAuthService
             return false;
         }
 
-        string token = "mock-jwt-token";
+        LoginResponse? response;
+        try
+        {
+            response = await apiClient.PostAsJsonAsync<LoginRequest, LoginResponse>(
+                "api/auth/login",
+                new LoginRequest(email, password),
+                cancellationToken);
+        }
+        catch (HttpRequestException)
+        {
+            return false;
+        }
+
+        if (response?.AccessToken is null)
+        {
+            return false;
+        }
+
+        string token = response.AccessToken;
         tokenStore.Set(token);
         await keyValueStore.SetAsync(TokenKey, token, cancellationToken);
         return true;

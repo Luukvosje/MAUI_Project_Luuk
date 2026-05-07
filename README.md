@@ -12,6 +12,7 @@ Schoolproject in `.NET MAUI` voor automatische kilometerregistratie en klantbezo
 
 ## Project structuur
 
+- `src/TimeOn.Mobile.Api` - centrale REST API voor auth, ritten, bezoeken, klanten en dagoverzichten
 - `src/TimeOn.Mobile.App` - MAUI UI, Views, ViewModels, DI setup
 - `src/TimeOn.Mobile.Core` - domeinmodellen, interfaces, use-cases
 - `src/TimeOn.Mobile.Infrastructure` - device/API/storage/repository implementaties
@@ -37,8 +38,11 @@ Schoolproject in `.NET MAUI` voor automatische kilometerregistratie en klantbezo
 ## API gebruik
 
 - API configuratie staat in `src/TimeOn.Mobile.App/appsettings.json`.
+- REST endpoints staan in `src/TimeOn.Mobile.Api/Controllers`.
 - Auth en API plumbing zitten in `src/TimeOn.Mobile.Infrastructure/Api`.
-- Huidige startup gebruikt een mock login token; deze is bedoeld als vervangbaar startpunt voor echte JWT-flow.
+- Login in de app gebruikt `POST /api/auth/login` en slaat de ontvangen bearer token lokaal op.
+- Start de API lokaal met:
+  - `dotnet run --project src/TimeOn.Mobile.Api/TimeOn.Mobile.Api.csproj`
 
 ## Testen
 
