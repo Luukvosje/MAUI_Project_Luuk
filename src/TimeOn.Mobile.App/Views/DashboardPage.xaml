@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:TimeOn.Mobile.App.ViewModels"
+             x:Class="TimeOn.Mobile.App.Views.DashboardPage"
+             x:DataType="viewModels:DashboardViewModel"
+             Title="{Binding Title}">
+    <VerticalStackLayout Padding="16" Spacing="12">
+        <Label Text="{Binding TrackingState}" Style="{StaticResource SubHeadline}" />
+        <Button Text="Start workday" Command="{Binding StartDayCommand}" />
+        <Button Text="Stop workday" Command="{Binding StopDayCommand}" />
+    </VerticalStackLayout>
+</ContentPage>

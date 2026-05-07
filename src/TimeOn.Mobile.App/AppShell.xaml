@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="TimeOn.Mobile.App.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:TimeOn.Mobile.App.Views"
+    Title="TimeOn">
+    <TabBar>
+        <ShellContent
+            Title="Login"
+            ContentTemplate="{DataTemplate views:LoginPage}"
+            Route="LoginPage" />
+        <ShellContent
+            Title="Dashboard"
+            ContentTemplate="{DataTemplate views:DashboardPage}"
+            Route="DashboardPage" />
+        <ShellContent
+            Title="Trips"
+            ContentTemplate="{DataTemplate views:TripsOverviewPage}"
+            Route="TripsOverviewPage" />
+        <ShellContent
+            Title="Visits"
+            ContentTemplate="{DataTemplate views:VisitsPage}"
+            Route="VisitsPage" />
+    </TabBar>
+</Shell>
