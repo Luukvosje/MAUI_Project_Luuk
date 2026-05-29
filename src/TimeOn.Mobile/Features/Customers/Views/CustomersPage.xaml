@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TimeOn.Mobile.Features.Customers.ViewModels"
+             xmlns:dto="clr-namespace:TimeOn.Application.Features.Customers.DTOs;assembly=TimeOn.Application"
+             x:Class="TimeOn.Mobile.Features.Customers.Views.CustomersPage"
+             x:DataType="vm:CustomersViewModel"
+             Title="Customers">
+
+    <Grid Padding="24" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="12">
+        <Label Grid.Row="0" Text="Customers" FontSize="24" />
+
+        <HorizontalStackLayout Grid.Row="1" Spacing="8">
+            <Button Text="List" Command="{Binding ShowListCommand}" />
+            <Button Text="Map" Command="{Binding ShowMapCommand}" />
+            <Button Text="Create" Command="{Binding CreateCustomerCommand}" />
+        </HorizontalStackLayout>
+
+        <VerticalStackLayout Grid.Row="2" Spacing="6">
+            <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" />
+            <Label Text="{Binding ErrorMessage}" TextColor="IndianRed" />
+        </VerticalStackLayout>
+
+        <Grid Grid.Row="3">
+            <VerticalStackLayout Spacing="8" IsVisible="{Binding IsListView}">
+                <HorizontalStackLayout Spacing="8">
+                    <Button Text="Edit selected" Command="{Binding EditSelectedCustomerCommand}" />
+                    <Button Text="Delete selected" Command="{Binding DeleteSelectedCustomerCommand}" />
+                </HorizontalStackLayout>
+
+                <CollectionView ItemsSource="{Binding Customers}"
+                                SelectionMode="Single"
+                                SelectedItem="{Binding SelectedCustomer}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="dto:CustomerDto">
+                            <VerticalStackLayout Padding="8">
+                                <Label Text="{Binding Name}" FontAttributes="Bold" />
+                                <Label Text="{Binding ContactEmail}" />
+                                <Label Text="{Binding Address}" />
+                                <Label Text="{Binding IsActive, StringFormat='Active: {0}'}" />
+                            </VerticalStackLayout>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+
+            <Grid x:Name="NativeMapHost"
+                  IsVisible="{Binding IsNativeMapVisible}" />
+
+            <WebView x:Name="CustomersWebMap"
+                     IsVisible="{Binding IsWebMapVisible}" />
+        </Grid>
+    </Grid>
+</ContentPage>

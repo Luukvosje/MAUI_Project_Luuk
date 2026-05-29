@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TimeOn.Mobile.Features.Settings.ViewModels"
+             x:Class="TimeOn.Mobile.Features.Settings.Views.SettingsPage"
+             x:DataType="vm:SettingsViewModel"
+             Title="Settings">
+
+    <VerticalStackLayout Padding="24">
+        <Button Text="Logout" Command="{Binding LogoutCommand}" />
+    </VerticalStackLayout>
+</ContentPage>

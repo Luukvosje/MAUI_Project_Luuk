@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/solution/">
+    <Project Path="src/TimeOn.Api/TimeOn.Api.csproj" />
+    <Project Path="src/TimeOn.Application/TimeOn.Application.csproj" />
+    <Project Path="src/TimeOn.Domain/TimeOn.Domain.csproj" />
+    <Project Path="src/TimeOn.Infrastructure/TimeOn.Infrastructure.csproj" />
+    <Project Path="src/TimeOn.Mobile/TimeOn.Mobile.csproj">
+      <Deploy Solution="Debug|*" />
+    </Project>
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TimeOn.IntegrationTests/TimeOn.IntegrationTests.csproj" />
+    <Project Path="tests/TimeOn.UnitTests/TimeOn.UnitTests.csproj" />
+  </Folder>
+</Solution>
