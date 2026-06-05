@@ -9,7 +9,6 @@
     </Project>
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/TimeOn.IntegrationTests/TimeOn.IntegrationTests.csproj" />
     <Project Path="tests/TimeOn.UnitTests/TimeOn.UnitTests.csproj" />
   </Folder>
 </Solution>

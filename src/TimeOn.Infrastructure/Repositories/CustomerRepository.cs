@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TimeOn.Domain.Entities;
-using TimeOn.Domain.RepositoryInterfaces;
+using TimeOn.Domain.Interfaces;
 using TimeOn.Infrastructure.Persistence;
 
 namespace TimeOn.Infrastructure.Repositories;

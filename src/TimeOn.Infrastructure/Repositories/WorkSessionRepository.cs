@@ -1,105 +1,72 @@
 using Microsoft.EntityFrameworkCore;
 using TimeOn.Domain.Entities;
 using TimeOn.Domain.Enums;
-using TimeOn.Domain.RepositoryInterfaces;
+using TimeOn.Domain.Interfaces;
 using TimeOn.Infrastructure.Persistence;
 
 namespace TimeOn.Infrastructure.Repositories;
 
-public sealed class WorkSessionRepository : IWorkSessionRepository, ILocalWorkSessionRepository
+public sealed class WorkSessionRepository : IWorkSessionRepository
 {
     private readonly AppDbContext _remoteContext;
-    private readonly LocalDbContext _localContext;
 
-    public WorkSessionRepository(AppDbContext remoteContext, LocalDbContext localContext)
+    public WorkSessionRepository(AppDbContext remoteContext)
     {
         _remoteContext = remoteContext;
-        _localContext = localContext;
     }
 
-    public async Task<WorkSession?> GetByIdAsync(Guid id, bool useLocal = false)
+    public async Task<IReadOnlyList<WorkSession>> GetAllByUserIdAsync(Guid userId)
     {
-        var context = GetContext(useLocal);
-        return await context.WorkSessions
-            .FirstOrDefaultAsync(session => session.Id == id);
-    }
-
-    public async Task<WorkSession?> GetByIdWithDetailsAsync(Guid id, bool useLocal = false)
-    {
-        var context = GetContext(useLocal);
-        return await context.WorkSessions
-            .Include(session => session.RideSegments)
-            .Include(session => session.CustomerVisits)
-            .FirstOrDefaultAsync(session => session.Id == id);
-    }
-
-    public Task<WorkSession?> GetByIdWithDetailsAsync(Guid id)
-    {
-        return GetByIdWithDetailsAsync(id, useLocal: true);
-    }
-
-    public async Task<WorkSession?> GetActiveByUserIdAsync(Guid userId, bool useLocal = false)
-    {
-        var context = GetContext(useLocal);
-        return await context.WorkSessions
-            .Include(session => session.RideSegments)
-            .Include(session => session.CustomerVisits)
-            .FirstOrDefaultAsync(
-                session => session.UserId == userId && session.Status == WorkSessionStatus.Active);
-    }
-
-    public Task<WorkSession?> GetActiveByUserIdAsync(Guid userId)
-    {
-        return GetActiveByUserIdAsync(userId, useLocal: true);
-    }
-
-    public async Task<IReadOnlyList<WorkSession>> GetByUserIdAsync(Guid userId, bool useLocal = false)
-    {
-        var context = GetContext(useLocal);
-        return await context.WorkSessions
+        return await _remoteContext.WorkSessions
             .AsNoTracking()
             .Where(session => session.UserId == userId)
             .OrderByDescending(session => session.StartTimeUtc)
             .ToListAsync();
     }
 
-    public Task<IReadOnlyList<WorkSession>> GetByUserIdAsync(Guid userId)
+    public async Task<WorkSession?> GetByIdWithDetailsAsync(Guid id, Guid userId)
     {
-        return GetByUserIdAsync(userId, useLocal: true);
+        return await _remoteContext.WorkSessions
+            .Where(session => session.Id == id && session.UserId == userId)
+            .Include(session => session.DrivingSegments)
+            .Include(session => session.StationarySegments)
+            .FirstOrDefaultAsync(session => session.Id == id);
     }
 
-    public async Task AddAsync(WorkSession workSession, bool useLocal = false)
+    public async Task<WorkSession?> GetActiveByUserIdAsync(Guid userId)
     {
-        var context = GetContext(useLocal);
-        await context.WorkSessions.AddAsync(workSession);
-        await context.SaveChangesAsync();
+        return await _remoteContext.WorkSessions
+            .Include(session => session.DrivingSegments)
+            .Include(session => session.StationarySegments)
+            .FirstOrDefaultAsync(
+                session => session.UserId == userId && session.Status == WorkSessionStatus.Active);
     }
 
-    public Task AddAsync(WorkSession workSession)
+    public async Task AddAsync(WorkSession workSession)
     {
-        return AddAsync(workSession, useLocal: true);
-    }
-
-    public void Update(WorkSession workSession, bool useLocal = false)
-    {
-        var context = GetContext(useLocal);
-        context.WorkSessions.Update(workSession);
-        context.SaveChanges();
+        await _remoteContext.WorkSessions.AddAsync(workSession);
+        await _remoteContext.SaveChangesAsync();
     }
 
     public void Update(WorkSession workSession)
     {
-        Update(workSession, useLocal: true);
+
+        _remoteContext.WorkSessions.Update(workSession);
+        _remoteContext.SaveChanges();
     }
 
-    public void Remove(WorkSession workSession)
+    public async Task<bool> DeleteAsync(Guid id, Guid userId)
     {
-        _localContext.WorkSessions.Remove(workSession);
-        _localContext.SaveChanges();
-    }
+        var session = await _remoteContext.WorkSessions
+            .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
 
-    private TimeOnDbContextBase GetContext(bool useLocal)
-    {
-        return useLocal ? _localContext : _remoteContext;
+        if (session is null)
+        {
+            return false;
+        }
+
+        _remoteContext.WorkSessions.Remove(session);
+        await _remoteContext.SaveChangesAsync();
+        return true;
     }
 }

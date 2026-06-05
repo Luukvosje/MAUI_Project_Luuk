@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using TimeOn.Mobile.Caching;
 using TimeOn.Mobile.Features.Authentication.ViewModels;
 using TimeOn.Mobile.Features.Authentication.Views;
+using TimeOn.Mobile.Features.Customers.Services;
 using TimeOn.Mobile.Features.Customers.ViewModels;
 using TimeOn.Mobile.Features.Customers.Views;
 using TimeOn.Mobile.Features.Dashboard.ViewModels;
@@ -13,10 +14,16 @@ using TimeOn.Mobile.Features.Tracking.ViewModels;
 using TimeOn.Mobile.Features.Tracking.Views;
 using TimeOn.Mobile.Features.Trips.ViewModels;
 using TimeOn.Mobile.Features.Trips.Views;
+using TimeOn.Mobile.Features.Tracking.Services;
+using TimeOn.Mobile.Http;
 using TimeOn.Mobile.Interfaces;
 using TimeOn.Mobile.Services;
 using TimeOn.Mobile.Sync;
 using TimeOn.Application.Features.Customers.Services;
+using TimeOn.Application.Features.WorkSessions.Services;
+#if ANDROID
+using TimeOn.Mobile.Platforms.Android;
+#endif
 
 namespace TimeOn.Mobile.Extensions;
 
@@ -31,24 +38,48 @@ public static class ServiceCollectionExtensions
         builder.Services.AddSingleton<ISyncQueue, SyncQueue>();
 
         builder.Services.AddSingleton<ILocalStorageService, LocalStorageService>();
+        builder.Services.AddSingleton<IDevelopmentModeService, DevelopmentModeService>();
         builder.Services.AddSingleton<INotificationService, NotificationService>();
-        builder.Services.AddSingleton<ILocationTrackingService, LocationTrackingService>();
+        builder.Services.AddSingleton<SqliteTrackingStore>();
+        builder.Services.AddSingleton<ITrackingGpsStore>(sp => sp.GetRequiredService<SqliteTrackingStore>());
+        builder.Services.AddSingleton<IGpsTrackingService, GpsTrackingService>();
+#if ANDROID
+        builder.Services.AddSingleton<IPlatformLocationTracker, AndroidPlatformLocationTracker>();
+#else
+        builder.Services.AddSingleton<IPlatformLocationTracker, PollingLocationTracker>();
+#endif
         builder.Services.AddSingleton<ISyncService, SyncService>();
 
-        builder.Services.AddHttpClient<IApiService, ApiService>(client =>
+        var apiBaseUrl = ResolveApiBaseUrl(configuration["TimeOnApi:BaseUrl"]);
+
+        builder.Services.AddSingleton<IAuthSessionCoordinator, AuthSessionCoordinator>();
+        builder.Services.AddSingleton<IAuthTokenStore, AuthTokenStore>();
+        builder.Services.AddSingleton<ITokenRefreshService, TokenRefreshService>();
+        builder.Services.AddTransient<BearerTokenRefreshingHandler>();
+
+        builder.Services.AddHttpClient("TimeOn.Auth", client =>
         {
-            var baseUrl = ResolveApiBaseUrl(configuration["TimeOnApi:BaseUrl"]);
-            client.BaseAddress = new Uri(baseUrl);
+            client.BaseAddress = new Uri(apiBaseUrl);
             client.Timeout = TimeSpan.FromSeconds(30);
         });
 
+        builder.Services.AddHttpClient<IApiService, ApiService>(client =>
+        {
+            client.BaseAddress = new Uri(apiBaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(30);
+        }).AddHttpMessageHandler<BearerTokenRefreshingHandler>();
+
         builder.Services.AddScoped<ICustomerService, RemoteCustomerService>();
+        builder.Services.AddScoped<IWorkSessionService, RemoteWorkSessionService>();
         builder.Services.AddSingleton<IAuthenticationService, AuthenticationService>();
+        builder.Services.AddSingleton<ICustomersMapPresentationService, CustomersMapPresentationService>();
 
         builder.Services.AddTransient<LoginViewModel>();
         builder.Services.AddTransient<RegisterViewModel>();
         builder.Services.AddTransient<DashboardViewModel>();
         builder.Services.AddTransient<TripsViewModel>();
+        builder.Services.AddTransient<TripDetailViewModel>();
+        builder.Services.AddTransient<CustomersMapViewModel>();
         builder.Services.AddTransient<CustomersViewModel>();
         builder.Services.AddTransient<CustomerFormViewModel>();
         builder.Services.AddTransient<TrackingViewModel>();
@@ -58,6 +89,7 @@ public static class ServiceCollectionExtensions
         builder.Services.AddTransient<RegisterPage>();
         builder.Services.AddTransient<DashboardPage>();
         builder.Services.AddTransient<TripsPage>();
+        builder.Services.AddTransient<TripDetailPage>();
         builder.Services.AddTransient<CustomersPage>();
         builder.Services.AddTransient<CustomerFormPage>();
         builder.Services.AddTransient<TrackingPage>();

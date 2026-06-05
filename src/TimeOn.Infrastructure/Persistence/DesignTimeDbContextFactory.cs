@@ -8,14 +8,11 @@ public sealed class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<App
 {
     public AppDbContext CreateDbContext(string[] args)
     {
+        var basePath = Path.GetDirectoryName(typeof(DesignTimeDbContextFactory).Assembly.Location)!;
         var configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true)
-            .AddInMemoryCollection(new Dictionary<string, string?>
-            {
-                ["ConnectionStrings:DefaultConnection"] =
-                    "Server=(localdb)\\mssqllocaldb;Database=TimeOn;Trusted_Connection=True;TrustServerCertificate=True"
-            })
+            .SetBasePath(basePath)
+            .AddJsonFile(Path.Combine("..", "TimeOn.Api", "appsettings.json"), optional: false)
+       
             .Build();
 
         var connectionString = configuration.GetConnectionString("DefaultConnection")

@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using TimeOn.Api.DependencyInjection;
+using TimeOn.Api.Services;
 using TimeOn.Application.DependencyInjection;
+using TimeOn.Application.Interfaces.Authentication;
 using TimeOn.Infrastructure.DependencyInjection;
 using TimeOn.Infrastructure.Persistence;
 
@@ -11,6 +14,9 @@ if (builder.Environment.IsDevelopment())
 }
 
 builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserAccessor, HttpContextCurrentUserAccessor>();
+builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
@@ -44,6 +50,9 @@ else
 {
     app.UseHttpsRedirection();
 }
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

@@ -20,22 +20,22 @@ public sealed class WorkSessionConfiguration : IEntityTypeConfiguration<WorkSess
             .HasMaxLength(32)
             .IsRequired();
 
-        builder.HasMany(session => session.RideSegments)
+        builder.HasMany(session => session.DrivingSegments)
             .WithOne(segment => segment.WorkSession)
             .HasForeignKey(segment => segment.WorkSessionId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Navigation(session => session.RideSegments)
-            .HasField("_rideSegments")
+        builder.Navigation(session => session.DrivingSegments)
+            .HasField("_drivingSegments")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
 
-        builder.HasMany(session => session.CustomerVisits)
+        builder.HasMany(session => session.StationarySegments)
             .WithOne(visit => visit.WorkSession)
             .HasForeignKey(visit => visit.WorkSessionId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Navigation(session => session.CustomerVisits)
-            .HasField("_customerVisits")
+        builder.Navigation(session => session.StationarySegments)
+            .HasField("_stationarySegments")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

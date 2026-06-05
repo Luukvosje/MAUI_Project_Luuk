@@ -1,5 +1,4 @@
 using System.Net.Http.Json;
-using System.Net.Http.Headers;
 using System.Text.Json;
 using TimeOn.Mobile.Interfaces;
 
@@ -13,12 +12,10 @@ public sealed class ApiService : IApiService
     };
 
     private readonly HttpClient _httpClient;
-    private readonly ILocalStorageService _localStorageService;
 
-    public ApiService(HttpClient httpClient, ILocalStorageService localStorageService)
+    public ApiService(HttpClient httpClient)
     {
         _httpClient = httpClient;
-        _localStorageService = localStorageService;
     }
 
     public string? LastError { get; private set; }
@@ -27,7 +24,6 @@ public sealed class ApiService : IApiService
     {
         return await SendAsync(async () =>
         {
-            await ApplyAuthorizationHeaderAsync();
             var response = await _httpClient.GetAsync(endpoint);
             return await ReadSuccessResponseAsync<TResponse>(response);
         });
@@ -37,7 +33,6 @@ public sealed class ApiService : IApiService
     {
         return await SendAsync(async () =>
         {
-            await ApplyAuthorizationHeaderAsync();
             var response = await _httpClient.PostAsJsonAsync(endpoint, request);
             return await ReadSuccessResponseAsync<TResponse>(response);
         });
@@ -47,7 +42,6 @@ public sealed class ApiService : IApiService
     {
         return await SendAsync(async () =>
         {
-            await ApplyAuthorizationHeaderAsync();
             var response = await _httpClient.PutAsJsonAsync(endpoint, request);
             return await ReadSuccessResponseAsync<TResponse>(response);
         });
@@ -57,7 +51,6 @@ public sealed class ApiService : IApiService
     {
         await SendAsync(async () =>
         {
-            await ApplyAuthorizationHeaderAsync();
             var response = await _httpClient.DeleteAsync(endpoint);
             if (!response.IsSuccessStatusCode)
             {
@@ -144,23 +137,11 @@ public sealed class ApiService : IApiService
         return response.StatusCode switch
         {
             System.Net.HttpStatusCode.BadRequest => "The request was invalid.",
-            System.Net.HttpStatusCode.Unauthorized => "You are not authorized.",
+            System.Net.HttpStatusCode.Unauthorized => "Your session has expired. Please sign in again.",
             System.Net.HttpStatusCode.NotFound => "The requested resource was not found.",
             System.Net.HttpStatusCode.InternalServerError => "A server error occurred.",
             _ => $"Request failed ({(int)response.StatusCode})."
         };
-    }
-
-    private async Task ApplyAuthorizationHeaderAsync()
-    {
-        var token = await _localStorageService.GetAsync<string>(AuthenticationService.AuthTokenKey);
-        if (string.IsNullOrWhiteSpace(token))
-        {
-            _httpClient.DefaultRequestHeaders.Authorization = null;
-            return;
-        }
-
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
     }
 
     private sealed class ApiErrorResponse

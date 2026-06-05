@@ -1,11 +1,12 @@
 using FluentValidation;
 using TimeOn.Application.Behaviors;
-using TimeOn.Domain.Shared;
 using TimeOn.Application.Features.Customers.DTOs;
+using TimeOn.Application.Interfaces;
+using TimeOn.Application.Interfaces.Authentication;
 using TimeOn.Domain.Entities;
 using TimeOn.Domain.Exceptions;
-using TimeOn.Domain.RepositoryInterfaces;
-using TimeOn.Application.Interfaces;
+using TimeOn.Domain.Interfaces;
+using TimeOn.Domain.Shared;
 using TimeOn.Domain.ValueObjects;
 
 namespace TimeOn.Application.Features.Customers.Services;
@@ -16,17 +17,15 @@ public sealed class CustomerService : ICustomerService
     private readonly IGeoLocationService _geoLocationService;
     private readonly IValidator<CreateCustomerRequestDto> _createValidator;
     private readonly IValidator<UpdateCustomerRequestDto> _updateValidator;
+    private readonly ICurrentUserAccessor _currentUserAccessor;
 
-    public CustomerService(
-        ICustomerRepository customerRepository,
-        IGeoLocationService geoLocationService,
-        IValidator<CreateCustomerRequestDto> createValidator,
-        IValidator<UpdateCustomerRequestDto> updateValidator)
+    public CustomerService(ICustomerRepository customerRepository, IGeoLocationService geoLocationService, IValidator<CreateCustomerRequestDto> createValidator, IValidator<UpdateCustomerRequestDto> updateValidator, ICurrentUserAccessor currentUserAccessor)
     {
         _customerRepository = customerRepository;
         _geoLocationService = geoLocationService;
         _createValidator = createValidator;
         _updateValidator = updateValidator;
+        _currentUserAccessor = currentUserAccessor;
 }
 
     public async Task<Result<IReadOnlyList<CustomerDto>>> GetCustomersAsync()
@@ -56,12 +55,14 @@ public sealed class CustomerService : ICustomerService
             return Result<CustomerDto>.Failure(coordinateResult.Error ?? "Unable to resolve address coordinates.");
         }
 
+        var userId = _currentUserAccessor.UserId;
         Customer customer;
         try
         {
             customer = Customer.Create(
                 Guid.NewGuid(),
                 request.Name,
+                userId,
                 request.ContactEmail,
                 request.Address,
                 request.IsActive,

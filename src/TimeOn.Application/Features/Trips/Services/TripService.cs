@@ -1,6 +1,6 @@
 using TimeOn.Domain.Shared;
 using TimeOn.Application.Features.Trips.DTOs;
-using TimeOn.Domain.RepositoryInterfaces;
+using TimeOn.Domain.Interfaces;
 
 namespace TimeOn.Application.Features.Trips.Services;
 
@@ -21,10 +21,12 @@ public sealed class TripService : ITripService
         return Task.FromResult(Result<TripDto>.Failure("Not implemented."));
     }
 
-    public Task<Result<IReadOnlyList<TripDto>>> GetByUserIdAsync(Guid userId)
+    public Task<Result<IReadOnlyList<TripDto>>> GetAllByUserId(Guid userId)
     {
         _ = _workSessionRepository;
         _ = userId;
+
+        
         
         return Task.FromResult(Result<IReadOnlyList<TripDto>>.Failure("Not implemented."));
     }

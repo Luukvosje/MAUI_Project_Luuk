@@ -10,14 +10,24 @@ namespace TimeOn.Mobile.Features.Customers.ViewModels;
 public partial class CustomersViewModel : ObservableObject
 {
     private readonly ICustomerService _customerService;
+    private readonly CustomersMapViewModel _mapViewModel;
+    private bool _reloadOnNextAppear;
 
     public ObservableCollection<CustomerDto> Customers { get; } = [];
+
+    public CustomersMapViewModel Map => _mapViewModel;
 
     [ObservableProperty]
     public partial bool IsLoading { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasSelectedCustomer))]
+    [NotifyPropertyChangedFor(nameof(SelectedCustomerName))]
     public partial CustomerDto? SelectedCustomer { get; set; }
+
+    public bool HasSelectedCustomer => SelectedCustomer is not null;
+
+    public string? SelectedCustomerName => SelectedCustomer?.Name;
 
     [ObservableProperty]
     public partial string? ErrorMessage { get; set; }
@@ -31,9 +41,27 @@ public partial class CustomersViewModel : ObservableObject
     public bool IsNativeMapVisible => IsMapView && !IsWindowsPlatform;
     public bool IsWebMapVisible => IsMapView && IsWindowsPlatform;
 
-    public CustomersViewModel(ICustomerService customerService)
+    public CustomersViewModel(ICustomerService customerService, CustomersMapViewModel mapViewModel)
     {
         _customerService = customerService;
+        _mapViewModel = mapViewModel;
+        Customers.CollectionChanged += (_, _) => _mapViewModel.Refresh(Customers);
+    }
+
+    public void MarkReloadOnReturn()
+    {
+        _reloadOnNextAppear = true;
+    }
+
+    public bool ShouldReloadOnAppear()
+    {
+        if (_reloadOnNextAppear)
+        {
+            _reloadOnNextAppear = false;
+            return true;
+        }
+
+        return Customers.Count == 0;
     }
 
     partial void OnSelectedViewChanged(string value)
@@ -43,6 +71,11 @@ public partial class CustomersViewModel : ObservableObject
         OnPropertyChanged(nameof(IsMapView));
         OnPropertyChanged(nameof(IsNativeMapVisible));
         OnPropertyChanged(nameof(IsWebMapVisible));
+
+        if (IsMapView)
+        {
+            _mapViewModel.Refresh(Customers);
+        }
     }
 
     [RelayCommand]
@@ -74,13 +107,14 @@ public partial class CustomersViewModel : ObservableObject
     [RelayCommand]
     private async Task CreateCustomerAsync()
     {
+        MarkReloadOnReturn();
         await Shell.Current.GoToAsync(nameof(CustomerFormPage));
     }
 
     [RelayCommand]
     private async Task EditSelectedCustomerAsync()
     {
-        if (SelectedCustomer is null)
+        if (SelectedCustomer == null)
         {
             ErrorMessage = "Select a customer first.";
             return;
@@ -92,7 +126,7 @@ public partial class CustomersViewModel : ObservableObject
     [RelayCommand]
     private async Task DeleteSelectedCustomerAsync()
     {
-        if (SelectedCustomer is null)
+        if (SelectedCustomer == null)
         {
             ErrorMessage = "Select a customer first.";
             return;
@@ -102,33 +136,16 @@ public partial class CustomersViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task SelectMapMarkerAsync(Guid customerId)
+    private Task SelectMapMarkerAsync(Guid customerId)
     {
         var customer = Customers.FirstOrDefault(c => c.Id == customerId);
-        if (customer is null)
+        if (customer is not null)
         {
-            return;
+            SelectedCustomer = customer;
+            ErrorMessage = null;
         }
 
-        SelectedCustomer = customer;
-
-        var action = await Shell.Current.DisplayActionSheetAsync(
-            customer.Name,
-            "Cancel",
-            null,
-            "Edit customer",
-            "Delete customer");
-
-        if (action == "Edit customer")
-        {
-            await NavigateToEditAsync(customer);
-            return;
-        }
-
-        if (action == "Delete customer")
-        {
-            await DeleteCustomerAsync(customer);
-        }
+        return Task.CompletedTask;
     }
 
     private async Task ExecuteWithLoading(Func<Task> action)
@@ -151,6 +168,7 @@ public partial class CustomersViewModel : ObservableObject
 
     private async Task NavigateToEditAsync(CustomerDto customer)
     {
+        MarkReloadOnReturn();
         await Shell.Current.GoToAsync(nameof(CustomerFormPage), new Dictionary<string, object>
         {
             ["customer"] = customer

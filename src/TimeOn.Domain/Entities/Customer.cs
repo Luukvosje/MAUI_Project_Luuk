@@ -10,6 +10,7 @@ namespace TimeOn.Domain.Entities;
 public sealed class Customer : Entity
 {
     public string Name { get; private set; } = string.Empty;
+    public Guid? UserId { get; private set; }
     public string? Address { get; private set; }
     public string? ContactEmail { get; private set; }
     public bool IsActive { get; private set; }
@@ -24,6 +25,7 @@ public sealed class Customer : Entity
     private Customer(
         Guid id,
         string name,
+        Guid? userId,
         string? contactEmail,
         string? address,
         bool isActive,
@@ -31,6 +33,7 @@ public sealed class Customer : Entity
         DateTime lastSyncedAtUtc) : base(id)
     {
         Name = name;
+        UserId = userId;
         ContactEmail = contactEmail;
         Address = address;
         IsActive = isActive;
@@ -41,6 +44,7 @@ public sealed class Customer : Entity
     public static Customer Create(
         Guid id,
         string name,
+        Guid? userId,
         string? contactEmail,
         string? address,
         bool isActive,
@@ -52,12 +56,14 @@ public sealed class Customer : Entity
         }
 
         ValidateName(name);
+        ValidateUserId(userId);
         ValidateContactEmail(contactEmail);
         ValidateAddress(address, location);
 
         return new Customer(
             id,
             name.Trim(),
+            userId,
             contactEmail?.Trim(),
             address?.Trim(),
             isActive,
@@ -81,11 +87,13 @@ public sealed class Customer : Entity
         IsActive = isActive;
         Location = location;
     }
-    public Distance DistanceTo(Coordinate coordinate) => Distance.Between(Location, coordinate);
-    public bool IsWithinProximity(Coordinate coordinate)
+
+    private static void ValidateUserId(Guid? userId)
     {
-        ArgumentNullException.ThrowIfNull(coordinate);
-        return DistanceTo(coordinate).Meters <= TrackingConstants.CustomerProximityRadiusMeters;
+        if (userId == null)
+        {
+            throw new DomainException("User id is required.");
+        }
     }
     private static void ValidateName(string name)
     {

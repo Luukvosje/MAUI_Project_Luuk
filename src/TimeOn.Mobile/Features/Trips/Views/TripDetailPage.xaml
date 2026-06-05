@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TimeOn.Mobile.Features.Trips.ViewModels"
+             x:Class="TimeOn.Mobile.Features.Trips.Views.TripDetailPage"
+             x:DataType="vm:TripDetailViewModel"
+             Title="{Binding Title}">
+
+    <Grid Padding="24" RowDefinitions="Auto,Auto,*" RowSpacing="12">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto">
+            <Button Text="Back"
+                    Command="{Binding GoBackCommand}" />
+            <Label Grid.Column="1"
+                   Text="Trip details"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+            <Button Grid.Column="2"
+                    Text="Delete"
+                    TextColor="IndianRed"
+                    Command="{Binding DeleteCommand}" />
+        </Grid>
+
+        <VerticalStackLayout Grid.Row="1" Spacing="6">
+            <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" />
+            <Label Text="{Binding ErrorMessage}" TextColor="IndianRed" />
+            <Label Text="{Binding StartLabel, StringFormat='Started: {0}'}" />
+            <Label Text="{Binding EndLabel, StringFormat='Ended: {0}'}" />
+            <Label Text="{Binding Status, StringFormat='Status: {0}'}" />
+            <Label Text="{Binding TotalDistanceKm, StringFormat='Total: {0:F2} km'}" />
+        </VerticalStackLayout>
+
+        <ScrollView Grid.Row="2">
+            <VerticalStackLayout Spacing="12">
+                <Label Text="Segments" FontSize="18" FontAttributes="Bold" />
+
+                <CollectionView ItemsSource="{Binding Segments}"
+                                SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="12" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.EmptyView>
+                        <Label Text="No segments recorded for this trip." />
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:SegmentListItem">
+                            <Border
+                                    StrokeThickness="1"
+                                    Padding="16">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="8" />
+                                </Border.StrokeShape>
+                                <VerticalStackLayout Spacing="6">
+                                    <Label Text="{Binding Title}"
+                                           FontAttributes="Bold" />
+                                    <Label Text="{Binding Details}" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

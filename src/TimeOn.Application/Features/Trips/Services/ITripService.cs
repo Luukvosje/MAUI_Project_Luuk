@@ -6,5 +6,5 @@ namespace TimeOn.Application.Features.Trips.Services;
 public interface ITripService
 {
     Task<Result<TripDto>> GetByIdAsync(Guid id);
-    Task<Result<IReadOnlyList<TripDto>>> GetByUserIdAsync(Guid userId);
+    Task<Result<IReadOnlyList<TripDto>>> GetAllByUserId(Guid userId);
 }

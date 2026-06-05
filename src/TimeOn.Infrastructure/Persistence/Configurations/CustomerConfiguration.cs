@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TimeOn.Domain.Entities;
-using TimeOn.Infrastructure.Persistence.Extensions;
 
 namespace TimeOn.Infrastructure.Persistence.Configurations;
 
@@ -29,9 +28,6 @@ public sealed class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.Property(customer => customer.LastSyncedAtUtc)
             .IsRequired();
 
-        builder.OwnsOne(customer => customer.Location, location =>
-        {
-            OwnedCoordinateConfiguration.Configure(location);
-        });
+        builder.OwnsOne(customer => customer.Location);
     }
 }

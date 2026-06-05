@@ -6,8 +6,9 @@ using TimeOn.Application.Features.Customers.Services;
 using TimeOn.Application.Features.Customers.Validators;
 using TimeOn.Application.Interfaces;
 using TimeOn.Domain.Entities;
-using TimeOn.Domain.RepositoryInterfaces;
 using TimeOn.Domain.ValueObjects;
+using TimeOn.Application.Interfaces.Authentication;
+using TimeOn.Domain.Interfaces;
 
 namespace TimeOn.UnitTests.Application.Customers;
 
@@ -15,13 +16,15 @@ public class CustomerServiceTests
 {
     private readonly ICustomerRepository _customerRepository = Substitute.For<ICustomerRepository>();
     private readonly IGeoLocationService _geoLocationService = Substitute.For<IGeoLocationService>();
+    private readonly ICurrentUserAccessor _currentUserAccessor = Substitute.For<ICurrentUserAccessor>();
 
     private CustomerService CreateSut() =>
         new(
             _customerRepository,
             _geoLocationService,
             new CreateCustomerRequestValidator(),
-            new UpdateCustomerRequestValidator());
+            new UpdateCustomerRequestValidator(),
+            _currentUserAccessor);
 
     [Fact]
     public async Task GetCustomersAsync_ReturnsMappedCustomers()
@@ -29,6 +32,7 @@ public class CustomerServiceTests
         var customer = Customer.Create(
             Guid.NewGuid(),
             "ACME",
+            userId: null,
             "contact@acme.com",
             "Street 1",
             true,
@@ -89,7 +93,7 @@ public class CustomerServiceTests
     public async Task UpdateCustomerAsync_WithExistingCustomer_UpdatesCustomer()
     {
         var customerId = Guid.NewGuid();
-        var customer = Customer.Create(customerId, "Old", "old@test.com", "Old address", true, Coordinate.Create(1, 1));
+        var customer = Customer.Create(customerId, "Old", userId: null, "old@test.com", "Old address", true, Coordinate.Create(1, 1));
         _customerRepository.GetByIdAsync(customerId).Returns(customer);
         var request = new UpdateCustomerRequestDto("New", "new@test.com", "New address", false);
         _geoLocationService.AdressToCoordinate("New address")
@@ -119,7 +123,7 @@ public class CustomerServiceTests
     [Fact]
     public async Task DeleteCustomerAsync_WithExistingCustomer_DeletesCustomer()
     {
-        var customer = Customer.Create(Guid.NewGuid(), "Del", "del@test.com", "Address", true, Coordinate.Create(1, 1));
+        var customer = Customer.Create(Guid.NewGuid(), "Del", userId: null, "del@test.com", "Address", true, Coordinate.Create(1, 1));
         _customerRepository.GetByIdAsync(customer.Id).Returns(customer);
 
         var result = await CreateSut().DeleteCustomerAsync(customer.Id);

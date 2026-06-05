@@ -7,7 +7,8 @@ public static class TrackingConstants
 
     public const double CustomerProximityRadiusMeters = 500;
 
-    public static readonly TimeSpan MinimumStopDuration = TimeSpan.FromMinutes(2);
+    public static readonly TimeSpan MinimumStopDurationMinutes = TimeSpan.FromMinutes(2);
+    public const int MaxStationaryDistanceMeters = 150;
     public const int MinRidingSpeedKph = 10;
 
     public const double EarthRadiusMeters = 6_371_000;
@@ -17,4 +18,12 @@ public static class TrackingConstants
     public const int MaxCustomerAddressLength = 500;
     public const int MaxCustomerContactEmailLength = 320;
 
+}
+public static class TrackingOptions
+{
+    public const int DefaultIntervalSeconds = 30;
+    public const int FastIntervalSeconds = 10;
+    public const double MinDistanceMeters = 25;
+    public const double FastSpeedKmh = 10;
+    public const double MaxAccuracyMeters = 50;
 }

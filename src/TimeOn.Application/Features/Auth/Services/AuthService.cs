@@ -6,7 +6,6 @@ using TimeOn.Application.Interfaces.Authentication;
 using TimeOn.Domain.Entities;
 using TimeOn.Domain.Exceptions;
 using TimeOn.Domain.Interfaces;
-using TimeOn.Domain.RepositoryInterfaces;
 using TimeOn.Domain.ValueObjects;
 
 namespace TimeOn.Application.Features.Auth.Services;
@@ -66,13 +65,47 @@ public sealed class AuthService : IAuthService
             return Result<LoginResponseDto>.Failure("Invalid email or password.");
         }
 
-        var token = _jwtTokenService.GenerateToken(
+        return Result<LoginResponseDto>.Success(CreateTokenResponse(user));
+    }
+
+    public async Task<Result<LoginResponseDto>> RefreshAsync(RefreshTokenRequestDto request)
+    {
+        if (string.IsNullOrWhiteSpace(request.RefreshToken))
+        {
+            return Result<LoginResponseDto>.Failure("Refresh token is required.");
+        }
+
+        var principal = _jwtTokenService.ValidateRefreshToken(request.RefreshToken);
+        if (principal is null)
+        {
+            return Result<LoginResponseDto>.Failure("Invalid or expired refresh token.");
+        }
+
+        var user = await _userRepository.GetByIdAsync(principal.UserId);
+        if (user is null)
+        {
+            return Result<LoginResponseDto>.Failure("Invalid or expired refresh token.");
+        }
+
+        return Result<LoginResponseDto>.Success(CreateTokenResponse(user));
+    }
+
+    private LoginResponseDto CreateTokenResponse(User user)
+    {
+        var access = _jwtTokenService.GenerateAccessToken(
+            user.Id,
+            user.Email.Value,
+            AuthRoles.Default);
+        var refresh = _jwtTokenService.GenerateRefreshToken(
             user.Id,
             user.Email.Value,
             AuthRoles.Default);
 
-        return Result<LoginResponseDto>.Success(
-            new LoginResponseDto(token.AccessToken, token.ExpiresAt));
+        return new LoginResponseDto(
+            access.AccessToken,
+            access.ExpiresAt,
+            refresh.AccessToken,
+            refresh.ExpiresAt);
     }
 
     public async Task<Result<RegisterResponseDto>> RegisterAsync(RegisterRequestDto request)
@@ -117,12 +150,13 @@ public sealed class AuthService : IAuthService
 
         await _userRepository.AddAsync(user);
 
-        var token = _jwtTokenService.GenerateToken(
-            user.Id,
-            user.Email.Value,
-            AuthRoles.Default);
+        var tokens = CreateTokenResponse(user);
 
         return Result<RegisterResponseDto>.Success(
-            new RegisterResponseDto(token.AccessToken, token.ExpiresAt));
+            new RegisterResponseDto(
+                tokens.AccessToken,
+                tokens.ExpiresAt,
+                tokens.RefreshToken,
+                tokens.RefreshExpiresAt));
     }
 }

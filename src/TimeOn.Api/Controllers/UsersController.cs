@@ -15,17 +15,6 @@ public sealed class UsersController : ControllerBase
         _dbContext = dbContext;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        var users = await _dbContext.Users
-            .AsNoTracking()
-            .Select(user => new UserResponse(user.Id, user.Name, user.Email.Value))
-            .ToListAsync();
-
-        return Ok(users);
-    }
-
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {

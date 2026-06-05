@@ -9,4 +9,13 @@ public partial class TrackingPage : ContentPage
         InitializeComponent();
         BindingContext = viewModel;
     }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        if (BindingContext is TrackingViewModel viewModel)
+        {
+            viewModel.OnAppearing();
+        }
+    }
 }

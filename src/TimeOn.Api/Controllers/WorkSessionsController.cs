@@ -1,28 +1,46 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TimeOn.Application.Interfaces.Authentication;
+using TimeOn.Application.Features.WorkSessions.DTOs;
+using TimeOn.Application.Features.WorkSessions.Services;
 using TimeOn.Infrastructure.Persistence;
 using System.Linq.Expressions;
 
 namespace TimeOn.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
-public sealed class WorkSessionsController : ControllerBase
+public sealed class WorkSessionsController(
+    AppDbContext dbContext,
+    IWorkSessionService workSessionService,
+    ICurrentUserAccessor currentUserAccessor) : ControllerBase
 {
-    private readonly AppDbContext _dbContext;
-
-    public WorkSessionsController(AppDbContext dbContext)
+    [HttpPost("complete")]
+    public async Task<IActionResult> Complete([FromBody] CompleteWorkSessionRequest request)
     {
-        _dbContext = dbContext;
+        var result = await workSessionService.CompleteFromTrackingAsync(request);
+        if (result.IsFailure)
+        {
+            return BadRequest(new { error = result.Error });
+        }
+
+        return Ok(result.Value);
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var sessions = await _dbContext.WorkSessions
+        var userId = currentUserAccessor.UserId;
+        if (userId is null)
+            return Unauthorized();
+
+        var sessions = await dbContext.WorkSessions
             .AsNoTracking()
+            .Where(session => session.UserId == userId.Value)
             .OrderByDescending(session => session.StartTimeUtc)
-            .Select(MapToResponse())
+            .Select(MapToListItem())
             .ToListAsync();
 
         return Ok(sessions);
@@ -31,42 +49,36 @@ public sealed class WorkSessionsController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var session = await _dbContext.WorkSessions
-            .AsNoTracking()
-            .Where(item => item.Id == id)
-            .Select(MapToResponse())
-            .FirstOrDefaultAsync();
+        var result = await workSessionService.GetWorkSessionDetailsAsync(id);
 
-        return session is null ? NotFound() : Ok(session);
+        if (result.IsFailure)
+        {
+            return NotFound(new { error = result.Error });
+        }
+
+        return Ok(result.Value);
     }
 
-    [HttpGet("by-user/{userId:guid}")]
-    public async Task<IActionResult> GetByUserId(Guid userId)
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
     {
-        var sessions = await _dbContext.WorkSessions
-            .AsNoTracking()
-            .Where(session => session.UserId == userId)
-            .OrderByDescending(session => session.StartTimeUtc)
-            .Select(MapToResponse())
-            .ToListAsync();
+        var result = await workSessionService.DeleteAsync(id);
 
-        return Ok(sessions);
+        if (result.IsFailure)
+        {
+            return NotFound(new { error = result.Error });
+        }
+
+        return NoContent();
     }
 
-    private static Expression<Func<TimeOn.Domain.Entities.WorkSession, WorkSessionResponse>> MapToResponse() =>
-        session => new WorkSessionResponse(
+    private static Expression<Func<TimeOn.Domain.Entities.WorkSession, WorkSessionListItemDto>> MapToListItem() =>
+        session => new WorkSessionListItemDto(
             session.Id,
             session.UserId,
             session.Status.ToString(),
             session.StartTimeUtc,
             session.EndTimeUtc,
             session.TotalDistanceKm);
-
-    private sealed record WorkSessionResponse(
-        Guid Id,
-        Guid UserId,
-        string Status,
-        DateTime StartTimeUtc,
-        DateTime? EndTimeUtc,
-        double TotalDistanceKm);
 }
+

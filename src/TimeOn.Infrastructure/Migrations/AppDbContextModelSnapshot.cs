@@ -49,49 +49,15 @@ namespace TimeOn.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.ToTable("Customers", (string)null);
                 });
 
-            modelBuilder.Entity("TimeOn.Domain.Entities.CustomerVisit", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("ArrivalTimeUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DepartureTimeUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double>("DistanceFromCustomerMeters")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("float(10)");
-
-                    b.Property<int?>("DurationMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("WorkSessionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("WorkSessionId1")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WorkSessionId");
-
-                    b.HasIndex("WorkSessionId1");
-
-                    b.ToTable("CustomerVisits", (string)null);
-                });
-
-            modelBuilder.Entity("TimeOn.Domain.Entities.RideSegment", b =>
+            modelBuilder.Entity("TimeOn.Domain.Entities.DrivingSegment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -100,25 +66,55 @@ namespace TimeOn.Infrastructure.Migrations
                     b.Property<double>("DistanceMeters")
                         .HasColumnType("float");
 
-                    b.Property<DateTime?>("EndTimeUtc")
+                    b.Property<DateTime>("EndUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("StartTimeUtc")
+                    b.Property<DateTime>("StartUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("WorkSessionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("WorkSessionId1")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("WorkSessionId");
 
-                    b.HasIndex("WorkSessionId1");
+                    b.ToTable("DrivingSegments", (string)null);
+                });
 
-                    b.ToTable("RideSegments", (string)null);
+            modelBuilder.Entity("TimeOn.Domain.Entities.StationarySegment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double>("CenterLatitude")
+                        .HasColumnType("float");
+
+                    b.Property<double>("CenterLongitude")
+                        .HasColumnType("float");
+
+                    b.Property<Guid?>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double?>("DistanceFromCustomerMeters")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("float(10)");
+
+                    b.Property<DateTime>("EndUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("StartUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("WorkSessionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkSessionId");
+
+                    b.ToTable("StationarySegments", (string)null);
                 });
 
             modelBuilder.Entity("TimeOn.Domain.Entities.User", b =>
@@ -191,30 +187,26 @@ namespace TimeOn.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TimeOn.Domain.Entities.CustomerVisit", b =>
+            modelBuilder.Entity("TimeOn.Domain.Entities.DrivingSegment", b =>
                 {
-                    b.HasOne("TimeOn.Domain.Entities.WorkSession", null)
-                        .WithMany()
+                    b.HasOne("TimeOn.Domain.Entities.WorkSession", "WorkSession")
+                        .WithMany("DrivingSegments")
                         .HasForeignKey("WorkSessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TimeOn.Domain.Entities.WorkSession", null)
-                        .WithMany("CustomerVisits")
-                        .HasForeignKey("WorkSessionId1");
+                    b.Navigation("WorkSession");
                 });
 
-            modelBuilder.Entity("TimeOn.Domain.Entities.RideSegment", b =>
+            modelBuilder.Entity("TimeOn.Domain.Entities.StationarySegment", b =>
                 {
-                    b.HasOne("TimeOn.Domain.Entities.WorkSession", null)
-                        .WithMany()
+                    b.HasOne("TimeOn.Domain.Entities.WorkSession", "WorkSession")
+                        .WithMany("StationarySegments")
                         .HasForeignKey("WorkSessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TimeOn.Domain.Entities.WorkSession", null)
-                        .WithMany("RideSegments")
-                        .HasForeignKey("WorkSessionId1");
+                    b.Navigation("WorkSession");
                 });
 
             modelBuilder.Entity("TimeOn.Domain.Entities.User", b =>
@@ -268,9 +260,9 @@ namespace TimeOn.Infrastructure.Migrations
 
             modelBuilder.Entity("TimeOn.Domain.Entities.WorkSession", b =>
                 {
-                    b.Navigation("CustomerVisits");
+                    b.Navigation("DrivingSegments");
 
-                    b.Navigation("RideSegments");
+                    b.Navigation("StationarySegments");
                 });
 #pragma warning restore 612, 618
         }

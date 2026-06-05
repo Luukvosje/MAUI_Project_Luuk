@@ -15,6 +15,7 @@ public static class RoutingExtensions
         Routing.RegisterRoute(nameof(RegisterPage), typeof(RegisterPage));
         Routing.RegisterRoute(nameof(DashboardPage), typeof(DashboardPage));
         Routing.RegisterRoute(nameof(TripsPage), typeof(TripsPage));
+        Routing.RegisterRoute(nameof(TripDetailPage), typeof(TripDetailPage));
         Routing.RegisterRoute(nameof(CustomersPage), typeof(CustomersPage));
         Routing.RegisterRoute(nameof(CustomerFormPage), typeof(CustomerFormPage));
         Routing.RegisterRoute(nameof(TrackingPage), typeof(TrackingPage));
