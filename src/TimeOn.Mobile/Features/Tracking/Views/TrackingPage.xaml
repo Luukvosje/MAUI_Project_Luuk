@@ -11,14 +11,13 @@
             <Label Text="Tracker Modus" FontSize="24" FontAttributes="Bold" />
             <Label Text="{Binding StatusText}" FontSize="16" />
             <Label Text="{Binding ErrorMessage}"
-                   TextColor="Red"
+                   Style="{StaticResource ErrorLabel}"
                    IsVisible="{Binding HasError}" />
 
             <Button Text="Start" Command="{Binding StartCommand}" />
             <Button Text="Stop" Command="{Binding StopCommand}" />
 
             <BoxView HeightRequest="1"
-                     Color="{AppThemeBinding Light=#DDDDDD, Dark=#444444}"
                      IsVisible="{Binding ShowDevelopmentTools}" />
 
             <VerticalStackLayout Spacing="12"
@@ -27,8 +26,7 @@
                        FontSize="18"
                        FontAttributes="Bold" />
                 <Label Text="Plak de volledige inhoud van points.json (JSON-array)."
-                       FontSize="14"
-                       TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                       Style="{StaticResource Caption}" />
                 <Editor Text="{Binding GpsPointsJson}"
                         Placeholder="Plak hier de JSON-array uit points.json"
                         HeightRequest="320"

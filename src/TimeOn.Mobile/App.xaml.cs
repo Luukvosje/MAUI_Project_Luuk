@@ -1,24 +1,37 @@
-﻿namespace TimeOn.Mobile;
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace TimeOn.Mobile;
 
 public partial class App : Microsoft.Maui.Controls.Application
 {
-    private readonly AppShell _appShell;
+    private AppShell? _appShell;
 
-    public App(AppShell appShell)
+    public App()
     {
         InitializeComponent();
-        _appShell = appShell;
+        UserAppTheme = AppTheme.Light;
     }
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
-        var window = new Window(_appShell);
-        _appShell.Loaded += OnAppShellLoaded;
+        var appShell = Handler?.MauiContext?.Services.GetRequiredService<AppShell>()
+            ?? throw new InvalidOperationException("Unable to resolve AppShell from the MAUI service provider.");
+
+        appShell.ConfigurePages();
+        _appShell = appShell;
+
+        var window = new Window(appShell);
+        appShell.Loaded += OnAppShellLoaded;
         return window;
     }
 
     private async void OnAppShellLoaded(object? sender, EventArgs e)
     {
+        if (_appShell is null)
+        {
+            return;
+        }
+
         _appShell.Loaded -= OnAppShellLoaded;
 
         try

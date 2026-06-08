@@ -17,8 +17,8 @@ public abstract class GpsSegment: Entity
     public Guid WorkSessionId { get; set; }
     public WorkSession? WorkSession { get; set; }
     public SegmentType Type { get; }
-    public DateTime StartUtc { get; }
-    public DateTime EndUtc { get; }
+    public DateTime StartUtc { get; private set; }
+    public DateTime EndUtc { get; private set; }
 
     [NotMapped]
     public IReadOnlyList<GpsPoint> Points { get; }
@@ -52,11 +52,26 @@ public abstract class GpsSegment: Entity
         _ => throw new ArgumentOutOfRangeException(nameof(type), $"Unknown segment type: {type}")
     };
 
+    public Result UpdateTimes(DateTime startUtc, DateTime endUtc)
+    {
+        TimeRange.EnsureUtc(startUtc, nameof(startUtc));
+        TimeRange.EnsureUtc(endUtc, nameof(endUtc));
+
+        if (endUtc <= startUtc)
+        {
+            return Result.Failure("End time must be after start time.");
+        }
+
+        StartUtc = startUtc;
+        EndUtc = endUtc;
+        return Result.Success();
+    }
+
 }
 
 public sealed class DrivingSegment : GpsSegment
 {
-    public double DistanceMeters { get; }
+    public double DistanceMeters { get; private set; }
     public double DistanceKm => DistanceMeters / 1000;
 
     private DrivingSegment()
@@ -79,14 +94,25 @@ public sealed class DrivingSegment : GpsSegment
 
         return total;
     }
+
+    public Result UpdateDistanceKm(double distanceKm)
+    {
+        if (distanceKm < 0)
+        {
+            return Result.Failure("Distance cannot be negative.");
+        }
+
+        DistanceMeters = distanceKm * 1000;
+        return Result.Success();
+    }
 }
 
 public sealed class StationarySegment : GpsSegment
 {
     public double CenterLatitude { get; }
     public double CenterLongitude { get; }
-    public Guid? CustomerId { get; }
-    public double? DistanceFromCustomerMeters { get; }
+    public Guid? CustomerId { get; private set; }
+    public double? DistanceFromCustomerMeters { get; private set; }
 
     private StationarySegment()
     {
@@ -105,4 +131,11 @@ public sealed class StationarySegment : GpsSegment
     }
 
     public bool IsCustomerVisit => CustomerId.HasValue;
+
+    public Result UpdateCustomer(Guid? customerId, double? distanceFromCustomerMeters)
+    {
+        CustomerId = customerId;
+        DistanceFromCustomerMeters = distanceFromCustomerMeters;
+        return Result.Success();
+    }
 }

@@ -15,6 +15,9 @@ public sealed class GpsTrackingService : IGpsTrackingService
     private readonly IApiService _apiService;
     private readonly IPlatformLocationTracker _platformTracker;
     private readonly ILocalStorageService _localStorageService;
+    private readonly INotificationService _notificationService;
+    private readonly IGpsNotificationSettingsService _gpsNotificationSettingsService;
+    private readonly DrivingStateDetector _drivingStateDetector;
     private readonly ILogger<GpsTrackingService> _logger;
     private readonly SemaphoreSlim _lifecycleLock = new(1, 1);
 
@@ -25,12 +28,18 @@ public sealed class GpsTrackingService : IGpsTrackingService
         IApiService apiService,
         IPlatformLocationTracker platformTracker,
         ILocalStorageService localStorageService,
+        INotificationService notificationService,
+        IGpsNotificationSettingsService gpsNotificationSettingsService,
+        DrivingStateDetector drivingStateDetector,
         ILogger<GpsTrackingService> logger)
     {
         _gpsStore = gpsStore;
         _apiService = apiService;
         _platformTracker = platformTracker;
         _localStorageService = localStorageService;
+        _notificationService = notificationService;
+        _gpsNotificationSettingsService = gpsNotificationSettingsService;
+        _drivingStateDetector = drivingStateDetector;
         _logger = logger;
     }
 
@@ -78,8 +87,9 @@ public sealed class GpsTrackingService : IGpsTrackingService
                     _activeSession.StartTimeUtc);
             }
 
-            await _platformTracker.StartAsync(IngestAsync);
+            _drivingStateDetector.Reset();
             SetState(TrackingState.Running);
+            await _platformTracker.StartAsync(IngestAsync);
         }
         finally
         {
@@ -113,6 +123,7 @@ public sealed class GpsTrackingService : IGpsTrackingService
                     session.Id);
                 await _gpsStore.ClearActiveSessionAsync(session.UserId);
                 _activeSession = null;
+                _drivingStateDetector.Reset();
                 SetState(TrackingState.Idle);
                 return new StopTrackingResult(SubmittedToApi: false, GpsPointCount: 0);
             }
@@ -133,6 +144,7 @@ public sealed class GpsTrackingService : IGpsTrackingService
             await _gpsStore.ClearActiveSessionAsync(session.UserId);
 
             _activeSession = null;
+            _drivingStateDetector.Reset();
             SetState(TrackingState.Idle);
 
             LogWorkSessionSubmitted(response);
@@ -172,8 +184,9 @@ public sealed class GpsTrackingService : IGpsTrackingService
                 return;
             }
 
-            await _platformTracker.StartAsync(IngestAsync);
+            _drivingStateDetector.Reset();
             SetState(TrackingState.Running);
+            await _platformTracker.StartAsync(IngestAsync);
             _logger.LogInformation("Resumed tracking for session {SessionId}", _activeSession.Id);
         }
         finally
@@ -223,43 +236,99 @@ public sealed class GpsTrackingService : IGpsTrackingService
 
     internal async Task IngestAsync(LocationReading reading)
     {
-        if (_activeSession is null || State != TrackingState.Running)
+        try
         {
-            _logger.LogDebug(
-                "GPS reading ignored (State={State}, HasActiveSession={HasSession})",
-                State,
-                _activeSession is not null);
-            return;
-        }
+            if (_activeSession is null || State != TrackingState.Running)
+            {
+                _logger.LogDebug(
+                    "GPS reading ignored (State={State}, HasActiveSession={HasSession})",
+                    State,
+                    _activeSession is not null);
+                return;
+            }
 
-        var lastPoint = await _gpsStore.GetLastPointAsync(_activeSession.Id);
-        var rejectReason = GpsSampleEvaluator.GetRejectReason(lastPoint, reading);
-        if (rejectReason is not null)
-        {
-            _logger.LogInformation(
-                "GPS reading skipped for session {SessionId}: {Reason} (lat={Latitude:F6}, lon={Longitude:F6}, accuracy={Accuracy:F1}m)",
-                _activeSession.Id,
-                rejectReason,
+            await HandleDrivingStateTransitionAsync(reading);
+
+            var lastPoint = await _gpsStore.GetLastPointAsync(_activeSession.Id);
+            var rejectReason = GpsSampleEvaluator.GetRejectReason(lastPoint, reading);
+            if (rejectReason is not null)
+            {
+                _logger.LogInformation(
+                    "GPS reading skipped for session {SessionId}: {Reason} (lat={Latitude:F6}, lon={Longitude:F6}, accuracy={Accuracy:F1}m)",
+                    _activeSession.Id,
+                    rejectReason,
+                    reading.Latitude,
+                    reading.Longitude,
+                    reading.Accuracy);
+                return;
+            }
+
+            var point = GpsPoint.Create(
                 reading.Latitude,
                 reading.Longitude,
-                reading.Accuracy);
-            return;
+                reading.TimestampUtc);
+
+            await _gpsStore.AddPointAsync(_activeSession.Id, point);
+            _logger.LogInformation(
+                "GpsPoint created for session {SessionId}: {Latitude:F6}, {Longitude:F6} at {RecordedAtUtc:O} (accuracy={Accuracy:F1}m, isFirst={IsFirst})",
+                _activeSession.Id,
+                point.Location.Latitude,
+                point.Location.Longitude,
+                point.RecordedAtUtc,
+                reading.Accuracy,
+                lastPoint is null);
+
+            if (_gpsNotificationSettingsService.IsEnabled)
+            {
+                var locationText =
+                    $"{point.Location.Latitude:F6}, {point.Location.Longitude:F6}";
+                await _notificationService.ShowLocalNotificationAsync(
+                    "Location saved",
+                    $"Saved at {locationText}");
+            }
         }
+        catch (Exception exception)
+        {
+            _logger.LogError(
+                exception,
+                "Failed to ingest GPS reading (lat={Latitude:F6}, lon={Longitude:F6})",
+                reading.Latitude,
+                reading.Longitude);
+        }
+    }
 
-        var point = GpsPoint.Create(
-            reading.Latitude,
-            reading.Longitude,
-            reading.TimestampUtc);
+    private async Task HandleDrivingStateTransitionAsync(LocationReading reading)
+    {
+        var (transition, effectiveSpeedKmh) = _drivingStateDetector.Evaluate(reading);
 
-        await _gpsStore.AddPointAsync(_activeSession.Id, point);
-        _logger.LogInformation(
-            "GpsPoint created for session {SessionId}: {Latitude:F6}, {Longitude:F6} at {RecordedAtUtc:O} (accuracy={Accuracy:F1}m, isFirst={IsFirst})",
-            _activeSession.Id,
-            point.Location.Latitude,
-            point.Location.Longitude,
-            point.RecordedAtUtc,
-            reading.Accuracy,
-            lastPoint is null);
+        _logger.LogDebug(
+            "Driving state sample for session {SessionId}: reported={ReportedSpeedKmh:F1} km/h, effective={EffectiveSpeedKmh:F1} km/h, transition={Transition}",
+            _activeSession!.Id,
+            reading.Speed * 3.6,
+            effectiveSpeedKmh,
+            transition);
+
+        switch (transition)
+        {
+            case DrivingStateTransition.StartedDriving:
+                _logger.LogInformation(
+                    "Driving detected for session {SessionId} at {SpeedKmh:F1} km/h",
+                    _activeSession.Id,
+                    effectiveSpeedKmh);
+                await _notificationService.ShowLocalNotificationAsync(
+                    "Driving detected",
+                    "Distance tracking is active again.");
+                break;
+            case DrivingStateTransition.Stopped:
+                _logger.LogInformation(
+                    "Stop detected for session {SessionId} at {SpeedKmh:F1} km/h",
+                    _activeSession.Id,
+                    effectiveSpeedKmh);
+                await _notificationService.ShowLocalNotificationAsync(
+                    "Stop detected",
+                    "You appear to be stationary.");
+                break;
+        }
     }
 
     private async Task<CompleteWorkSessionResponse> CompleteWorkSessionAsync(

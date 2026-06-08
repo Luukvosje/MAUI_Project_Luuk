@@ -92,7 +92,9 @@ public sealed class PollingLocationTracker : IPlatformLocationTracker
 
             var delaySeconds = lastSpeedKmh > TrackingOptions.FastSpeedKmh
                 ? TrackingOptions.FastIntervalSeconds
-                : TrackingOptions.DefaultIntervalSeconds;
+                : lastSpeedKmh < TrackingOptions.StationarySpeedKmh
+                    ? TrackingOptions.StationaryIntervalSeconds
+                    : TrackingOptions.DefaultIntervalSeconds;
 
             try
             {

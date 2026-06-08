@@ -1,6 +1,7 @@
 ## .NET
 bin/
 obj/
+.nuget-packages/
 *.user
 *.suo
 .vs/

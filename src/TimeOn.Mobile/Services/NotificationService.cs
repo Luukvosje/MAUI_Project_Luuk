@@ -2,13 +2,12 @@ using TimeOn.Mobile.Interfaces;
 
 namespace TimeOn.Mobile.Services;
 
-public sealed class NotificationService : INotificationService
+public partial class NotificationService : INotificationService
 {
     public Task ShowLocalNotificationAsync(string title, string message)
     {
-        _ = title;
-        _ = message;
-        
-        return Task.CompletedTask;
+        return ShowNotificationCoreAsync(title, message);
     }
+
+    private partial Task ShowNotificationCoreAsync(string title, string message);
 }

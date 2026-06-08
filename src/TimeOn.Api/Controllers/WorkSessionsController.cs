@@ -72,6 +72,22 @@ public sealed class WorkSessionsController(
         return NoContent();
     }
 
+    [HttpPut("{sessionId:guid}/segments/{segmentId:guid}")]
+    public async Task<IActionResult> UpdateSegment(
+        Guid sessionId,
+        Guid segmentId,
+        [FromBody] UpdateWorkSessionSegmentRequest request)
+    {
+        var result = await workSessionService.UpdateSegmentAsync(sessionId, segmentId, request);
+
+        if (result.IsFailure)
+        {
+            return NotFound(new { error = result.Error });
+        }
+
+        return Ok(result.Value);
+    }
+
     private static Expression<Func<TimeOn.Domain.Entities.WorkSession, WorkSessionListItemDto>> MapToListItem() =>
         session => new WorkSessionListItemDto(
             session.Id,

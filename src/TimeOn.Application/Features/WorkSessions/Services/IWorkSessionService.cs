@@ -8,5 +8,9 @@ public interface IWorkSessionService
     Task<Result<CompleteWorkSessionResponse>> CompleteFromTrackingAsync(CompleteWorkSessionRequest request);
     Task<Result<IReadOnlyList<WorkSessionListItemDto>>> GetAllAsync();
     Task<Result<WorkSessionDetailDto>> GetWorkSessionDetailsAsync(Guid id);
+    Task<Result<WorkSessionSegmentDto>> UpdateSegmentAsync(
+        Guid sessionId,
+        Guid segmentId,
+        UpdateWorkSessionSegmentRequest request);
     Task<Result> DeleteAsync(Guid id);
 }

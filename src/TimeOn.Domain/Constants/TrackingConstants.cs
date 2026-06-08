@@ -21,9 +21,11 @@ public static class TrackingConstants
 }
 public static class TrackingOptions
 {
-    public const int DefaultIntervalSeconds = 30;
-    public const int FastIntervalSeconds = 10;
-    public const double MinDistanceMeters = 25;
+    public const int DefaultIntervalSeconds = 15;
+    public const int FastIntervalSeconds = 5;
+    public const int StationaryIntervalSeconds = 30;
     public const double FastSpeedKmh = 10;
+    public const double StationarySpeedKmh = 2;  
+    public const double MinDistanceMeters = 25;
     public const double MaxAccuracyMeters = 50;
 }

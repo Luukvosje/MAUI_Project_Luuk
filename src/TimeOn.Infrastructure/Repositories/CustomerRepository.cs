@@ -26,6 +26,14 @@ public sealed class CustomerRepository : ICustomerRepository
             .ToListAsync();
     }
 
+    public async Task<IReadOnlyList<Customer>> GetActiveByUserIdAsync(Guid userId)
+    {
+        return await _context.Customers
+            .AsNoTracking()
+            .Where(customer => customer.UserId == userId && customer.IsActive)
+            .ToListAsync();
+    }
+
     public async Task AddAsync(Customer customer)
     {
         await _context.Customers.AddAsync(customer);

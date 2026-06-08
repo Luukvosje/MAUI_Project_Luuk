@@ -18,13 +18,15 @@ namespace TimeOn.Domain.Services
             _maxStationaryRadiusMeters = TrackingConstants.MaxStationaryDistanceMeters;
         }
 
-        public IReadOnlyList<GpsSegment> Classify(IReadOnlyList<GpsPoint> points)
+        public IReadOnlyList<GpsSegment> Classify(
+            IReadOnlyList<GpsPoint> points,
+            IReadOnlyList<Customer>? customers = null)
         {
             if (points == null || points.Count == 0)
                 return Array.Empty<GpsSegment>();
 
             bool[] isStationary = ComputeStationaryFlags(points);
-            return BuildSegments(points, isStationary);
+            return BuildSegments(points, isStationary, customers);
         }
 
         private bool[] ComputeStationaryFlags(IReadOnlyList<GpsPoint> points)
@@ -58,7 +60,8 @@ namespace TimeOn.Domain.Services
 
         private static IReadOnlyList<GpsSegment> BuildSegments(
             IReadOnlyList<GpsPoint> points,
-            bool[] isStationary)
+            bool[] isStationary,
+            IReadOnlyList<Customer>? customers)
         {
             var segments = new List<GpsSegment>();
             int i = 0;
@@ -74,7 +77,24 @@ namespace TimeOn.Domain.Services
                 var segmentPoints = points.Skip(start).Take(i - start).ToList();
                 var type = currentState ? SegmentType.Stationary : SegmentType.Driving;
 
-                segments.Add(GpsSegment.Create(type, segmentPoints));
+                Guid? customerId = null;
+                double? distanceFromCustomerMeters = null;
+
+                if (type == SegmentType.Stationary && customers is { Count: > 0 })
+                {
+                    var centerLatitude = segmentPoints.Average(point => point.Location.Latitude);
+                    var centerLongitude = segmentPoints.Average(point => point.Location.Longitude);
+                    var center = Coordinate.Create(centerLatitude, centerLongitude);
+                    var match = CustomerProximityMatcher.FindNearest(center, customers);
+
+                    if (match is not null)
+                    {
+                        customerId = match.CustomerId;
+                        distanceFromCustomerMeters = match.DistanceMeters;
+                    }
+                }
+
+                segments.Add(GpsSegment.Create(type, segmentPoints, customerId, distanceFromCustomerMeters));
             }
 
             return segments;

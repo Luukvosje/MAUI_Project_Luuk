@@ -18,6 +18,20 @@ public class WorkSessionTests
     }
 
     [Fact]
+    public void Stop_SetsStoppedStatusAndEndTime()
+    {
+        var startTimeUtc = DateTime.UtcNow.AddHours(-1);
+        var endTimeUtc = DateTime.UtcNow;
+        var session = WorkSession.Start(Guid.NewGuid(), startTimeUtc);
+
+        var result = session.Stop(endTimeUtc);
+
+        result.IsSuccess.Should().BeTrue();
+        session.Status.Should().Be(WorkSessionStatus.Stopped);
+        session.EndTimeUtc.Should().Be(endTimeUtc);
+    }
+
+    [Fact]
     public void RegisterCustomerVisit_WhenWithinRadius_AddsVisit()
     {
         var session = WorkSession.Start(Guid.NewGuid(), DateTime.UtcNow);

@@ -19,7 +19,7 @@
 
         <VerticalStackLayout Grid.Row="2" Spacing="6">
             <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" />
-            <Label Text="{Binding ErrorMessage}" TextColor="IndianRed" />
+            <Label Text="{Binding ErrorMessage}" Style="{StaticResource ErrorLabel}" />
         </VerticalStackLayout>
 
         <Grid Grid.Row="3" RowDefinitions="Auto,*" RowSpacing="8">
@@ -36,7 +36,7 @@
                 <CollectionView IsVisible="{Binding IsListView}"
                                 ItemsSource="{Binding Customers}"
                                 SelectedItem="{Binding SelectedCustomer}"
-                                SelectionMode="Single">
+                                SelectionMode="Single">  
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
                     </CollectionView.ItemsLayout>

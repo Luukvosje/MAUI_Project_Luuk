@@ -9,7 +9,7 @@
     <ScrollView>
         <VerticalStackLayout Padding="24" Spacing="12">
             <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" />
-            <Label Text="{Binding ErrorMessage}" TextColor="IndianRed" />
+            <Label Text="{Binding ErrorMessage}" Style="{StaticResource ErrorLabel}" />
 
             <Entry Placeholder="Name" Text="{Binding Name}" />
             <Entry Placeholder="Contact email" Text="{Binding ContactEmail}" />

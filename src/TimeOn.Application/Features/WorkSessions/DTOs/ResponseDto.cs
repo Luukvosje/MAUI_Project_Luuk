@@ -37,4 +37,5 @@ public sealed record WorkSessionSegmentDto(
     double? CenterLatitude,
     double? CenterLongitude,
     Guid? CustomerId,
+    string? CustomerName,
     bool IsCustomerVisit);

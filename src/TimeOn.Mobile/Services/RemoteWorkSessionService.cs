@@ -76,4 +76,25 @@ public sealed class RemoteWorkSessionService : IWorkSessionService
             return Result.Failure(_apiService.LastError ?? "Could not delete work session.");
         }
     }
+
+    public async Task<Result<WorkSessionSegmentDto>> UpdateSegmentAsync(
+        Guid sessionId,
+        Guid segmentId,
+        UpdateWorkSessionSegmentRequest request)
+    {
+        try
+        {
+            var segment = await _apiService.PutAsync<UpdateWorkSessionSegmentRequest, WorkSessionSegmentDto>(
+                $"{WorkSessionsEndpoint}/{sessionId}/segments/{segmentId}",
+                request);
+
+            return segment is null
+                ? Result<WorkSessionSegmentDto>.Failure(_apiService.LastError ?? "Could not update segment.")
+                : Result<WorkSessionSegmentDto>.Success(segment);
+        }
+        catch (Exception)
+        {
+            return Result<WorkSessionSegmentDto>.Failure(_apiService.LastError ?? "Could not update segment.");
+        }
+    }
 }

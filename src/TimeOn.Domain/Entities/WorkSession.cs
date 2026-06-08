@@ -77,9 +77,11 @@ public sealed class WorkSession: Entity
         return session;
     }
 
-    public Result ClassifyGpsPoints(IReadOnlyList<GpsPoint> gpsPoints)
+    public Result ClassifyGpsPoints(
+        IReadOnlyList<GpsPoint> gpsPoints,
+        IReadOnlyList<Customer>? customers = null)
     {
-        var segments = new GpsClassifier().Classify(gpsPoints);
+        var segments = new GpsClassifier().Classify(gpsPoints, customers);
         return ApplyClassifiedSegments(segments);
     }
 

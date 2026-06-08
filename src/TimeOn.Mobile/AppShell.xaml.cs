@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using TimeOn.Mobile.Features.Authentication.Views;
 using TimeOn.Mobile.Features.Customers.Views;
 using TimeOn.Mobile.Features.Dashboard.Views;
@@ -18,7 +19,9 @@ public partial class AppShell : Shell
     private readonly ITrackingGpsStore _trackingGpsStore;
     private readonly IGpsTrackingService _gpsTrackingService;
     private readonly IDevelopmentModeService _developmentModeService;
+    private readonly IGpsNotificationSettingsService _gpsNotificationSettingsService;
     private readonly IAuthSessionCoordinator _sessionCoordinator;
+    private readonly IServiceProvider _serviceProvider;
 
     public AppShell(
         ILogger<AppShell> logger,
@@ -27,13 +30,9 @@ public partial class AppShell : Shell
         ITrackingGpsStore trackingGpsStore,
         IGpsTrackingService gpsTrackingService,
         IDevelopmentModeService developmentModeService,
+        IGpsNotificationSettingsService gpsNotificationSettingsService,
         IAuthSessionCoordinator sessionCoordinator,
-        LoginPage loginPage,
-        DashboardPage dashboardPage,
-        TripsPage tripsPage,
-        CustomersPage customersPage,
-        TrackingPage trackingPage,
-        SettingsPage settingsPage)
+        IServiceProvider serviceProvider)
     {
         _logger = logger;
         _authenticationService = authenticationService;
@@ -41,17 +40,22 @@ public partial class AppShell : Shell
         _trackingGpsStore = trackingGpsStore;
         _gpsTrackingService = gpsTrackingService;
         _developmentModeService = developmentModeService;
+        _gpsNotificationSettingsService = gpsNotificationSettingsService;
         _sessionCoordinator = sessionCoordinator;
+        _serviceProvider = serviceProvider;
 
         InitializeComponent();
         _sessionCoordinator.SessionExpired += OnSessionExpired;
+    }
 
-        LoginShell.Content = loginPage;
-        DashboardShell.Content = dashboardPage;
-        TripsShell.Content = tripsPage;
-        CustomersShell.Content = customersPage;
-        TrackingShell.Content = trackingPage;
-        SettingsShell.Content = settingsPage;
+    public void ConfigurePages()
+    {
+        LoginShell.Content = _serviceProvider.GetRequiredService<LoginPage>();
+        DashboardShell.Content = _serviceProvider.GetRequiredService<DashboardPage>();
+        TripsShell.Content = _serviceProvider.GetRequiredService<TripsPage>();
+        CustomersShell.Content = _serviceProvider.GetRequiredService<CustomersPage>();
+        TrackingShell.Content = _serviceProvider.GetRequiredService<TrackingPage>();
+        SettingsShell.Content = _serviceProvider.GetRequiredService<SettingsPage>();
     }
 
     public async Task InitializeAsync()
@@ -70,6 +74,7 @@ public partial class AppShell : Shell
         await MainThread.InvokeOnMainThreadAsync(ApplyAuthState);
 
         await _developmentModeService.InitializeAsync();
+        await _gpsNotificationSettingsService.InitializeAsync();
         await InitializeTrackingAsync();
 
         if (_authenticationService.IsAuthenticated)

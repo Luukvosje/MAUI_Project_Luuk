@@ -77,7 +77,8 @@ public partial class CustomersMapView : ContentView
     {
         InitializeComponent();
 
-        if (DeviceInfo.Platform != DevicePlatform.WinUI)
+        if (DeviceInfo.Platform != DevicePlatform.WinUI &&
+            DeviceInfo.Platform != DevicePlatform.Android)
         {
             _customersMap = new MapsMap();
             NativeMapHost.Children.Add(_customersMap);

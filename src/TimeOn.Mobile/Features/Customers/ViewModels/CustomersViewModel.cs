@@ -37,9 +37,11 @@ public partial class CustomersViewModel : ObservableObject
 
     public bool IsListView => SelectedView == "List";
     public bool IsMapView => SelectedView == "Map";
-    public bool IsWindowsPlatform => DeviceInfo.Platform == DevicePlatform.WinUI;
-    public bool IsNativeMapVisible => IsMapView && !IsWindowsPlatform;
-    public bool IsWebMapVisible => IsMapView && IsWindowsPlatform;
+    public bool UseWebMap =>
+        DeviceInfo.Platform == DevicePlatform.WinUI ||
+        DeviceInfo.Platform == DevicePlatform.Android;
+    public bool IsNativeMapVisible => IsMapView && !UseWebMap;
+    public bool IsWebMapVisible => IsMapView && UseWebMap;
 
     public CustomersViewModel(ICustomerService customerService, CustomersMapViewModel mapViewModel)
     {

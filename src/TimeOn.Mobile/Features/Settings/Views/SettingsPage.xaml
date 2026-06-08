@@ -7,14 +7,22 @@
              Title="Settings">
 
     <VerticalStackLayout Padding="24" Spacing="16">
+        <VerticalStackLayout Spacing="8">
+            <Label Text="GPS notifications"
+                   FontSize="18"
+                   FontAttributes="Bold" />
+            <Label Text="Show a notification each time a GPS point is saved while tracking."
+                   Style="{StaticResource Caption}" />
+            <Switch IsToggled="{Binding AreGpsSaveNotificationsEnabled}" />
+        </VerticalStackLayout>
+
         <VerticalStackLayout Spacing="8"
                              IsVisible="{Binding IsDevelopmentModeSupported}">
             <Label Text="Development mode"
                    FontSize="18"
                    FontAttributes="Bold" />
             <Label Text="Enable GPS paste and dev tools on the Tracking page (Windows only)."
-                   FontSize="14"
-                   TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                   Style="{StaticResource Caption}" />
             <Switch IsToggled="{Binding IsDevelopmentModeEnabled}" />
         </VerticalStackLayout>
 

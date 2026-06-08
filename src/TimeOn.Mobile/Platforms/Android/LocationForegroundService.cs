@@ -4,7 +4,9 @@ using Android.App;
 using Android.Content;
 using Android.Locations;
 using Android.OS;
+using Android.Util;
 using AndroidX.Core.App;
+using AndroidX.Core.Content;
 using TimeOn.Domain.Constants;
 using TimeOn.Mobile.Features.Tracking.Models;
 using TimeOn.Mobile.Features.Tracking.Services;
@@ -17,6 +19,7 @@ namespace TimeOn.Mobile.Platforms.Android;
     ForegroundServiceType = global::Android.Content.PM.ForegroundService.TypeLocation)]
 public sealed class LocationForegroundService : Service, ILocationListener
 {
+    private const string LogTag = "TimeOnLocationService";
     private const int NotificationId = 10_001;
     private const string ChannelId = "timeon_location_tracking";
     private LocationManager? _locationManager;
@@ -27,30 +30,51 @@ public sealed class LocationForegroundService : Service, ILocationListener
         var notification = BuildNotification();
         StartForeground(NotificationId, notification);
 
-        _locationManager = (LocationManager?)GetSystemService(LocationService);
-        if (_locationManager is not null)
+        if (ContextCompat.CheckSelfPermission(this, global::Android.Manifest.Permission.AccessFineLocation)
+            != global::Android.Content.PM.Permission.Granted)
         {
-            var minTimeMs = TrackingOptions.FastIntervalSeconds * 1000;
-            var minDistanceM = (float)TrackingOptions.MinDistanceMeters;
-
-            if (_locationManager.IsProviderEnabled(LocationManager.GpsProvider))
-            {
-                _locationManager.RequestLocationUpdates(
-                    LocationManager.GpsProvider,
-                    minTimeMs,
-                    minDistanceM,
-                    this);
-            }
-
-            if (_locationManager.IsProviderEnabled(LocationManager.NetworkProvider))
-            {
-                _locationManager.RequestLocationUpdates(
-                    LocationManager.NetworkProvider,
-                    minTimeMs,
-                    minDistanceM,
-                    this);
-            }
+            Log.Error(LogTag, "Fine location permission is not granted; GPS updates will not be collected.");
+            return StartCommandResult.NotSticky;
         }
+
+        _locationManager = (LocationManager?)GetSystemService(LocationService);
+        if (_locationManager is null)
+        {
+            Log.Error(LogTag, "LocationManager is unavailable.");
+            return StartCommandResult.NotSticky;
+        }
+
+        var minTimeMs = TrackingOptions.FastIntervalSeconds * 1000;
+        const float minDistanceM = 0f;
+        var looper = Looper.MainLooper
+            ?? throw new InvalidOperationException("Main looper is unavailable for location updates.");
+
+        var providersRegistered = 0;
+        foreach (var provider in new[] { LocationManager.GpsProvider, LocationManager.NetworkProvider })
+        {
+            if (!_locationManager.IsProviderEnabled(provider))
+            {
+                Log.Warn(LogTag, "Location provider '{0}' is disabled.", provider);
+                continue;
+            }
+
+            _locationManager.RequestLocationUpdates(
+                provider,
+                minTimeMs,
+                minDistanceM,
+                this,
+                looper);
+            providersRegistered++;
+            Log.Info(LogTag, "Registered location updates for provider '{0}'.", provider);
+        }
+
+        if (providersRegistered == 0)
+        {
+            Log.Error(LogTag, "No enabled location providers found.");
+            return StartCommandResult.NotSticky;
+        }
+
+        PushLastKnownLocations();
 
         return StartCommandResult.Sticky;
     }
@@ -78,10 +102,62 @@ public sealed class LocationForegroundService : Service, ILocationListener
             location.HasSpeed ? location.Speed : 0d,
             DateTimeOffset.FromUnixTimeMilliseconds(location.Time).UtcDateTime);
 
+        Log.Debug(
+            LogTag,
+            "Location update received: lat={0:F6}, lon={1:F6}, accuracy={2:F1}m",
+            reading.Latitude,
+            reading.Longitude,
+            reading.Accuracy);
+
         var handler = LocationTrackingBridge.OnReading;
-        if (handler is not null)
+        if (handler is null)
         {
-            _ = handler(reading);
+            Log.Warn(LogTag, "Location update received but no tracking handler is registered.");
+            return;
+        }
+
+        _ = InvokeHandlerSafelyAsync(handler, reading);
+    }
+
+    private void PushLastKnownLocations()
+    {
+        if (_locationManager is null)
+        {
+            return;
+        }
+
+        foreach (var provider in new[] { LocationManager.GpsProvider, LocationManager.NetworkProvider })
+        {
+            if (!_locationManager.IsProviderEnabled(provider))
+            {
+                continue;
+            }
+
+            var location = _locationManager.GetLastKnownLocation(provider);
+            if (location is null)
+            {
+                continue;
+            }
+
+            Log.Info(LogTag, "Pushing last known location from provider '{0}'.", provider);
+            OnLocationChanged(location);
+            return;
+        }
+
+        Log.Warn(LogTag, "No last known location available from any provider.");
+    }
+
+    private static async Task InvokeHandlerSafelyAsync(
+        Func<LocationReading, Task> handler,
+        LocationReading reading)
+    {
+        try
+        {
+            await handler(reading).ConfigureAwait(false);
+        }
+        catch (Exception exception)
+        {
+            Log.Error(LogTag, $"Failed to process location update: {exception}");
         }
     }
 

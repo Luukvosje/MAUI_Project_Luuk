@@ -39,7 +39,9 @@ public static class ServiceCollectionExtensions
 
         builder.Services.AddSingleton<ILocalStorageService, LocalStorageService>();
         builder.Services.AddSingleton<IDevelopmentModeService, DevelopmentModeService>();
+        builder.Services.AddSingleton<IGpsNotificationSettingsService, GpsNotificationSettingsService>();
         builder.Services.AddSingleton<INotificationService, NotificationService>();
+        builder.Services.AddSingleton<DrivingStateDetector>();
         builder.Services.AddSingleton<SqliteTrackingStore>();
         builder.Services.AddSingleton<ITrackingGpsStore>(sp => sp.GetRequiredService<SqliteTrackingStore>());
         builder.Services.AddSingleton<IGpsTrackingService, GpsTrackingService>();

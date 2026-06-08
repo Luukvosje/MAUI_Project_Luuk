@@ -13,7 +13,7 @@
         <VerticalStackLayout Grid.Row="1" Spacing="8">
             <Button Text="Refresh" Command="{Binding RefreshCommand}" />
             <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" />
-            <Label Text="{Binding ErrorMessage}" TextColor="IndianRed" />
+            <Label Text="{Binding ErrorMessage}" Style="{StaticResource ErrorLabel}" />
         </VerticalStackLayout>
 
         <RefreshView Grid.Row="2"

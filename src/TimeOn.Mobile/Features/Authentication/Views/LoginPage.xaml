@@ -9,7 +9,7 @@
     <VerticalStackLayout Padding="24" Spacing="12">
         <Entry Text="{Binding Email}" Placeholder="Email" Keyboard="Email" />
         <Entry Text="{Binding Password}" Placeholder="Password" IsPassword="True" />
-        <Label Text="{Binding ErrorMessage}" TextColor="Red" />
+        <Label Text="{Binding ErrorMessage}" Style="{StaticResource ErrorLabel}" />
         <Button Text="Sign in" Command="{Binding LoginCommand}" />
         <Button Text="Sign up" Command="{Binding GoToRegisterCommand}" />
         <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
