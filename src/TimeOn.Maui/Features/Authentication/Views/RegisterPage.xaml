@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TimeOn.Maui.Features.Authentication.ViewModels"
+             x:Class="TimeOn.Maui.Features.Authentication.Views.RegisterPage"
+             x:DataType="vm:RegisterViewModel"
+             Title="Registreren">
+
+    <VerticalStackLayout Padding="24" Spacing="12">
+        <Entry Text="{Binding Name}" Placeholder="Naam" />
+        <Entry Text="{Binding Email}" Placeholder="E-mail" Keyboard="Email" />
+        <Entry Text="{Binding Password}" Placeholder="Wachtwoord" IsPassword="True" />
+        <Label Text="{Binding ErrorMessage}" Style="{StaticResource ErrorLabel}" />
+        <Button Text="Registreren" Command="{Binding RegisterCommand}" />
+        <Button Text="Inloggen" Command="{Binding GoToLoginCommand}" />
+        <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+    </VerticalStackLayout>
+</ContentPage>

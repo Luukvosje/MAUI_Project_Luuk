@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TimeOn.Maui.Features.Dashboard.ViewModels"
+             x:Class="TimeOn.Maui.Features.Dashboard.Views.DashboardPage"
+             x:DataType="vm:DashboardViewModel"
+             Title="Overzicht"
+             SafeAreaEdges="All">
+
+    <RefreshView IsRefreshing="{Binding IsRefreshing}"
+                 Command="{Binding RefreshCommand}">
+        <ScrollView>
+            <VerticalStackLayout Padding="{StaticResource PageContentPadding}"
+                                 Spacing="{StaticResource SpacingMedium}">
+                <Label Text="{Binding WelcomeMessage}"
+                       Style="{StaticResource PageTitle}" />
+
+                <Label Text="Overzicht van je werkdag"
+                       Style="{StaticResource BodySecondary}" />
+
+                <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                   IsVisible="{Binding IsLoading}"
+                                   HorizontalOptions="Center" />
+                <Label Text="{Binding ErrorMessage}"
+                       Style="{StaticResource ErrorLabel}" />
+
+                <Grid ColumnDefinitions="*,*"
+                      ColumnSpacing="{StaticResource SpacingSmall}"
+                      IsVisible="{Binding HasAnyActivity}">
+                    <Button Text="Dag"
+                            Command="{Binding SelectDayPeriodCommand}"
+                            Style="{StaticResource SecondaryButton}" />
+                    <Button Grid.Column="1"
+                            Text="Week"
+                            Command="{Binding SelectWeekPeriodCommand}"
+                            Style="{StaticResource SecondaryButton}" />
+                </Grid>
+
+                <Border Style="{StaticResource AppCard}"
+                        IsVisible="{Binding ShowDayOverview}">
+                    <VerticalStackLayout Spacing="{StaticResource SpacingSmall}">
+                        <Label Text="{Binding DayPeriodLabel}"
+                               Style="{StaticResource SectionTitle}" />
+                        <Grid ColumnDefinitions="*,*"
+                              ColumnSpacing="{StaticResource SpacingMedium}">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding DayDistanceLabel}"
+                                       FontFamily="OpenSansSemibold"
+                                       FontSize="28" />
+                                <Label Text="Rijafstand"
+                                       Style="{StaticResource Caption}" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1"
+                                                 Spacing="4">
+                                <Label Text="{Binding DayCustomerTimeLabel}"
+                                       FontFamily="OpenSansSemibold"
+                                       FontSize="28" />
+                                <Label Text="Tijd bij klanten"
+                                       Style="{StaticResource Caption}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Style="{StaticResource AppCard}"
+                        IsVisible="{Binding ShowWeekOverview}">
+                    <VerticalStackLayout Spacing="{StaticResource SpacingSmall}">
+                        <Label Text="{Binding WeekPeriodLabel}"
+                               Style="{StaticResource SectionTitle}" />
+                        <Grid ColumnDefinitions="*,*"
+                              ColumnSpacing="{StaticResource SpacingMedium}">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding WeekDistanceLabel}"
+                                       FontFamily="OpenSansSemibold"
+                                       FontSize="24" />
+                                <Label Text="Totaal gereden"
+                                       Style="{StaticResource Caption}" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1"
+                                                 Spacing="4">
+                                <Label Text="{Binding WeekCustomerTimeLabel}"
+                                       FontFamily="OpenSansSemibold"
+                                       FontSize="24" />
+                                <Label Text="Totaal bij klanten"
+                                       Style="{StaticResource Caption}" />
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <BoxView HeightRequest="1"
+                                 Color="{StaticResource Border}"
+                                 Margin="0,8,0,4" />
+
+                        <CollectionView ItemsSource="{Binding WeekDays}"
+                                        SelectionMode="None">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Vertical"
+                                                   ItemSpacing="8" />
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:DashboardWeekDayItem">
+                                    <Grid ColumnDefinitions="*,Auto,Auto"
+                                          ColumnSpacing="12">
+                                        <Label Text="{Binding DayLabel}"
+                                               Style="{StaticResource BodySecondary}"
+                                               VerticalOptions="Center" />
+                                        <Label Grid.Column="1"
+                                               Text="{Binding DistanceLabel}"
+                                               FontFamily="OpenSansSemibold"
+                                               FontSize="14"
+                                               VerticalOptions="Center" />
+                                        <Label Grid.Column="2"
+                                               Text="{Binding CustomerTimeLabel}"
+                                               FontFamily="OpenSansSemibold"
+                                               FontSize="14"
+                                               VerticalOptions="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Style="{StaticResource AppCard}"
+                        IsVisible="{Binding ShowEmptyState}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Nog geen ritten geregistreerd"
+                               Style="{StaticResource SectionTitle}" />
+                        <Label Text="Start registratie via het tabblad Registratie om je eerste werkdag vast te leggen."
+                               Style="{StaticResource BodySecondary}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Style="{StaticResource PrimaryActionCard}"
+                        Margin="0,8,0,0"
+                        IsVisible="{Binding ShowStartTrackingCard}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Registratie starten"
+                               TextColor="{StaticResource White}"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="18" />
+                        <Label Text="Open het tabblad Registratie om je werkdag te starten en ritten automatisch vast te leggen."
+                               TextColor="{StaticResource White}"
+                               Opacity="0.92"
+                               FontSize="14"
+                               LineBreakMode="WordWrap" />
+                        <BoxView HeightRequest="1"
+                                 Color="{StaticResource White}"
+                                 Opacity="0.25"
+                                 Margin="0,4,0,4" />
+                        <Label Text="Tabblad Registratie hieronder"
+                               TextColor="{StaticResource Secondary}"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="13" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Style="{StaticResource AppCard}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Status"
+                               Style="{StaticResource SectionTitle}" />
+                        <Label Text="{Binding TrackingStatusText}"
+                               Style="{StaticResource BodySecondary}" />
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
+</ContentPage>

@@ -3,6 +3,7 @@ using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using TimeOn.Application.Features.Auth.Services;
 using TimeOn.Application.Features.Customers.Services;
+using TimeOn.Application.Features.Dashboard.Services;
 using TimeOn.Application.Features.Trips.Services;
 using TimeOn.Application.Features.WorkSessions.Services;
 
@@ -20,6 +21,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<ITripService, TripService>();
         services.AddScoped<ICustomerService, CustomerService>();
         services.AddScoped<IWorkSessionService, WorkSessionService>();
+        services.AddScoped<IDashboardService, DashboardService>();
 
         return services;
     }

@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TimeOn.Maui.Features.Authentication.ViewModels"
+             x:Class="TimeOn.Maui.Features.Authentication.Views.LoginPage"
+             x:DataType="vm:LoginViewModel"
+             Shell.NavBarIsVisible="False"
+             SafeAreaEdges="All">
+
+    <Grid RowDefinitions="Auto,*">
+        <Border Grid.Row="0"
+                BackgroundColor="{StaticResource Primary}"
+                StrokeThickness="0"
+                Padding="24,48,24,32">
+            <VerticalStackLayout Spacing="16"
+                                 HorizontalOptions="Center">
+                <Image Source="appicon_white.png"
+                       HeightRequest="64"
+                       WidthRequest="64"
+                       Aspect="AspectFit"
+                       HorizontalOptions="Center" />
+                <Label Text="TimeOn"
+                       TextColor="{StaticResource White}"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="28"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center" />
+                <Label Text="Log in om je werkdag bij te houden"
+                       TextColor="{StaticResource White}"
+                       Opacity="0.9"
+                       FontSize="14"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+        </Border>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="{StaticResource PageContentPadding}"
+                                 Spacing="{StaticResource SpacingMedium}">
+                <Border Style="{StaticResource AppCard}">
+                    <VerticalStackLayout Spacing="{StaticResource SpacingSmall}">
+                        <Label Text="E-mail"
+                               Style="{StaticResource SectionTitle}" />
+                        <Border Style="{StaticResource FormEntryBorder}">
+                            <Entry Text="{Binding Email}"
+                                   Placeholder="naam@bedrijf.nl"
+                                   Keyboard="Email" />
+                        </Border>
+
+                        <Label Text="Wachtwoord"
+                               Style="{StaticResource SectionTitle}"
+                               Margin="0,8,0,0" />
+                        <Border Style="{StaticResource FormEntryBorder}">
+                            <Entry Text="{Binding Password}"
+                                   Placeholder="Je wachtwoord"
+                                   IsPassword="True" />
+                        </Border>
+
+                        <Label Text="{Binding ErrorMessage}"
+                               Style="{StaticResource ErrorLabel}"
+                               Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Button Text="Inloggen"
+                        Style="{StaticResource PrimaryButton}"
+                        Command="{Binding LoginCommand}" />
+                <Button Text="Account aanmaken"
+                        Style="{StaticResource SecondaryButton}"
+                        Command="{Binding GoToRegisterCommand}" />
+
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}"
+                                   HorizontalOptions="Center"
+                                   Margin="0,8,0,0" />
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

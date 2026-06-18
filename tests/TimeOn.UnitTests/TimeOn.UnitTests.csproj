@@ -24,7 +24,6 @@
     <ProjectReference Include="..\..\src\TimeOn.Domain\TimeOn.Domain.csproj" />
     <ProjectReference Include="..\..\src\TimeOn.Application\TimeOn.Application.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <None Include="Application\WorkSessions\GpsData\points.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

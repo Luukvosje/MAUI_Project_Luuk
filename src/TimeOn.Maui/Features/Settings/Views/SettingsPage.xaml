@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TimeOn.Maui.Features.Settings.ViewModels"
+             x:Class="TimeOn.Maui.Features.Settings.Views.SettingsPage"
+             x:DataType="vm:SettingsViewModel"
+             Title="Instellingen">
+
+    <VerticalStackLayout Padding="24" Spacing="16">
+        <VerticalStackLayout Spacing="8">
+            <Label Text="GPS-meldingen"
+                   FontSize="18"
+                   FontAttributes="Bold" />
+            <Label Text="Toon een melding telkens wanneer een GPS-punt wordt opgeslagen tijdens registratie."
+                   Style="{StaticResource Caption}" />
+            <Switch IsToggled="{Binding AreGpsSaveNotificationsEnabled}" />
+        </VerticalStackLayout>
+
+        <VerticalStackLayout Spacing="8"
+                             IsVisible="{Binding IsDevelopmentModeSupported}">
+            <Label Text="Ontwikkelmodus"
+                   FontSize="18"
+                   FontAttributes="Bold" />
+            <Label Text="Schakel GPS-plakken en ontwikkeltools in op de pagina Registratie (alleen Windows)."
+                   Style="{StaticResource Caption}" />
+            <Switch IsToggled="{Binding IsDevelopmentModeEnabled}" />
+        </VerticalStackLayout>
+
+        <Button Text="Uitloggen" Command="{Binding LogoutCommand}" />
+    </VerticalStackLayout>
+</ContentPage>

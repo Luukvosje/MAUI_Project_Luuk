@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TimeOn.Maui.Features.Trips.ViewModels"
+             xmlns:views="clr-namespace:TimeOn.Maui.Features.Trips.Views"
+             x:Class="TimeOn.Maui.Features.Trips.Views.TripDetailPage"
+             x:Name="TripDetailPageRoot"
+             x:DataType="vm:TripDetailViewModel"
+             Title="{Binding Title}"
+             SafeAreaEdges="All">
+
+    <Grid Padding="{StaticResource PageContentPadding}"
+          RowDefinitions="Auto,Auto,*"
+          RowSpacing="{StaticResource SpacingSmall}">
+
+        <Grid Grid.Row="0"
+              ColumnDefinitions="Auto,*,Auto"
+              ColumnSpacing="8">
+            <Button Text="Terug"
+                    Style="{StaticResource TextButton}"
+                    HorizontalOptions="Start"
+                    Command="{Binding GoBackCommand}" />
+            <Button Grid.Column="2"
+                    Text="Verwijderen"
+                    Style="{StaticResource TextDangerButton}"
+                    HorizontalOptions="End"
+                    Command="{Binding DeleteCommand}" />
+        </Grid>
+
+        <VerticalStackLayout Grid.Row="1"
+                             Spacing="6">
+            <ActivityIndicator IsRunning="{Binding IsLoading}"
+                               IsVisible="{Binding IsLoading}"
+                               HorizontalOptions="Center" />
+            <Label Text="{Binding ErrorMessage}"
+                   Style="{StaticResource ErrorLabel}" />
+
+            <Border Style="{StaticResource AppCard}">
+                <Grid ColumnDefinitions="*,*"
+                      RowDefinitions="Auto,Auto,Auto"
+                      ColumnSpacing="{StaticResource SpacingMedium}"
+                      RowSpacing="{StaticResource SpacingSmall}">
+                    <VerticalStackLayout Grid.Row="0"
+                                         Grid.Column="0"
+                                         Spacing="4">
+                        <Label Text="Gestart"
+                               Style="{StaticResource Caption}" />
+                        <Label Text="{Binding StartLabel}"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="15" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Row="0"
+                                         Grid.Column="1"
+                                         Spacing="4">
+                        <Label Text="Beëindigd"
+                               Style="{StaticResource Caption}" />
+                        <Label Text="{Binding EndLabel}"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="15" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Row="1"
+                                         Grid.Column="0"
+                                         Spacing="4">
+                        <Label Text="Status"
+                               Style="{StaticResource Caption}" />
+                        <Label Text="{Binding Status}"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="15" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Row="1"
+                                         Grid.Column="1"
+                                         Spacing="4">
+                        <Label Text="Totale afstand"
+                               Style="{StaticResource Caption}" />
+                        <Label Text="{Binding TotalDistanceKm, StringFormat='{0:F2} km'}"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="15" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+        </VerticalStackLayout>
+
+        <ScrollView Grid.Row="2">
+            <VerticalStackLayout Spacing="{StaticResource SpacingSmall}">
+                <Label Text="Segmenten"
+                       Style="{StaticResource SectionTitle}"
+                       Margin="0,4,0,0" />
+
+                <CollectionView ItemsSource="{Binding Segments}"
+                                SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical"
+                                           ItemSpacing="{StaticResource SpacingMedium}" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.EmptyView>
+                        <Label Text="Geen segmenten geregistreerd voor deze rit."
+                               Style="{StaticResource BodySecondary}"
+                               Margin="0,16,0,0" />
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:SegmentListItem">
+                            <Border Style="{StaticResource AppCard}">
+                                <VerticalStackLayout Spacing="{StaticResource SpacingSmall}">
+                                    <VerticalStackLayout Spacing="2">
+                                        <Label Text="{Binding Title}"
+                                               Style="{StaticResource SectionTitle}" />
+                                        <Label Text="{Binding DistanceKmText, StringFormat='{0} km'}"
+                                               Style="{StaticResource BodySecondary}"
+                                               IsVisible="{Binding IsDriving}" />
+                                    </VerticalStackLayout>
+
+                                    <Label Text="Start"
+                                           Style="{StaticResource Caption}"
+                                           Margin="0,4,0,0" />
+                                    <Grid ColumnDefinitions="*,*"
+                                          ColumnSpacing="{StaticResource SpacingSmall}">
+                                        <Border Style="{StaticResource FormEntryBorder}">
+                                            <DatePicker Date="{Binding StartDate}" />
+                                        </Border>
+                                        <Border Grid.Column="1"
+                                                Style="{StaticResource FormEntryBorder}">
+                                            <TimePicker Time="{Binding StartTime}" />
+                                        </Border>
+                                    </Grid>
+
+                                    <Label Text="Einde"
+                                           Style="{StaticResource Caption}" />
+                                    <Grid ColumnDefinitions="*,*"
+                                          ColumnSpacing="{StaticResource SpacingSmall}">
+                                        <Border Style="{StaticResource FormEntryBorder}">
+                                            <DatePicker Date="{Binding EndDate}" />
+                                        </Border>
+                                        <Border Grid.Column="1"
+                                                Style="{StaticResource FormEntryBorder}">
+                                            <TimePicker Time="{Binding EndTime}" />
+                                        </Border>
+                                    </Grid>
+
+                                    <VerticalStackLayout IsVisible="{Binding IsDriving}"
+                                                         Spacing="4">
+                                        <Label Text="Afstand (km)"
+                                               Style="{StaticResource Caption}" />
+                                        <Border Style="{StaticResource FormEntryBorder}">
+                                            <Entry Text="{Binding DistanceKmText}"
+                                                   Keyboard="Numeric"
+                                                   Placeholder="0.00" />
+                                        </Border>
+                                    </VerticalStackLayout>
+
+                                    <VerticalStackLayout IsVisible="{Binding IsStationary}"
+                                                         Spacing="4">
+                                        <Label Text="Klant"
+                                               Style="{StaticResource Caption}" />
+                                        <Border Style="{StaticResource FormEntryBorder}">
+                                            <Picker ItemsSource="{Binding Source={RelativeSource AncestorType={x:Type views:TripDetailPage}}, Path=BindingContext.CustomerOptions}"
+                                                    ItemDisplayBinding="{Binding Name}"
+                                                    SelectedItem="{Binding SelectedCustomer}" />
+                                        </Border>
+                                    </VerticalStackLayout>
+
+                                    <Button Text="Segment opslaan"
+                                            Style="{StaticResource CompactSecondaryButton}"
+                                            Margin="0,8,0,0"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type views:TripDetailPage}}, Path=BindingContext.SaveSegmentCommand}"
+                                            CommandParameter="{Binding .}" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

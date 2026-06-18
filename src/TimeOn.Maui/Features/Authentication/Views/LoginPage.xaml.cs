@@ -1,0 +1,36 @@
+﻿using System.ComponentModel;
+using TimeOn.Maui.Features.Authentication.ViewModels;
+
+namespace TimeOn.Maui.Features.Authentication.Views;
+
+public partial class LoginPage : ContentPage
+{
+    private readonly LoginViewModel _viewModel;
+
+    public LoginPage(LoginViewModel viewModel)
+    {
+        InitializeComponent();
+        _viewModel = viewModel;
+        BindingContext = _viewModel;
+        _viewModel.PropertyChanged += OnViewModelPropertyChanged;
+    }
+
+    protected override void OnDisappearing()
+    {
+        _viewModel.PropertyChanged -= OnViewModelPropertyChanged;
+        base.OnDisappearing();
+    }
+
+    private async void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(LoginViewModel.ErrorMessage))
+        {
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_viewModel.ErrorMessage))
+        {
+            await DisplayAlertAsync("Fout", _viewModel.ErrorMessage, "OK");
+        }
+    }
+}

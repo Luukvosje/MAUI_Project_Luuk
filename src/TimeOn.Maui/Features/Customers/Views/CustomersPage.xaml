@@ -1,0 +1,181 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TimeOn.Maui.Features.Customers.ViewModels"
+             xmlns:views="clr-namespace:TimeOn.Maui.Features.Customers.Views"
+             xmlns:dto="clr-namespace:TimeOn.Application.Features.Customers.DTOs;assembly=TimeOn.Application"
+             x:Class="TimeOn.Maui.Features.Customers.Views.CustomersPage"
+             x:Name="CustomersPageRoot"
+             x:DataType="vm:CustomersViewModel"
+             Title="Klanten"
+             SafeAreaEdges="All">
+
+    <Grid Padding="{StaticResource PageContentPadding}"
+          RowDefinitions="Auto,Auto,*"
+          RowSpacing="{StaticResource SpacingSmall}">
+
+        <Border Grid.Row="0"
+                Style="{StaticResource SegmentToggleBar}">
+            <Grid ColumnDefinitions="*,*,*"
+                  ColumnSpacing="4">
+                <Button Grid.Column="0"
+                        Text="Lijst"
+                        Style="{StaticResource SegmentToggleButton}"
+                        Command="{Binding ShowListCommand}">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button"
+                                     Binding="{Binding SelectedView}"
+                                     Value="List">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Surface}" />
+                            <Setter Property="TextColor" Value="{StaticResource Primary}" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button Grid.Column="1"
+                        Text="Kaart"
+                        Style="{StaticResource SegmentToggleButton}"
+                        Command="{Binding ShowMapCommand}">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button"
+                                     Binding="{Binding SelectedView}"
+                                     Value="Map">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Surface}" />
+                            <Setter Property="TextColor" Value="{StaticResource Primary}" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button Grid.Column="2"
+                        Text="Nieuw"
+                        Style="{StaticResource SegmentToggleButton}"
+                        Command="{Binding ShowCreateCommand}">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button"
+                                     Binding="{Binding SelectedView}"
+                                     Value="Create">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Surface}" />
+                            <Setter Property="TextColor" Value="{StaticResource Primary}" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+            </Grid>
+        </Border>
+
+        <VerticalStackLayout Grid.Row="1"
+                             Spacing="6">
+            <ActivityIndicator IsRunning="{Binding IsLoading}"
+                               IsVisible="{Binding IsLoading}"
+                               HorizontalOptions="Center" />
+            <Label Text="{Binding ErrorMessage}"
+                   Style="{StaticResource ErrorLabel}" />
+        </VerticalStackLayout>
+
+        <Grid Grid.Row="2">
+            <CollectionView IsVisible="{Binding IsListView}"
+                            ItemsSource="{Binding Customers}"
+                            SelectedItem="{Binding SelectedCustomer}"
+                            SelectionMode="Single">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical"
+                                       ItemSpacing="{StaticResource SpacingSmall}" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.EmptyView>
+                    <Label Text="Nog geen klanten."
+                           Style="{StaticResource BodySecondary}"
+                           HorizontalOptions="Center"
+                           Margin="0,40,0,0" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="dto:CustomerDto">
+                        <Border Style="{StaticResource ListItemCard}">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal">
+                                        <VisualState.Setters>
+                                            <Setter TargetName="ActionRow"
+                                                    Property="IsVisible"
+                                                    Value="False" />
+                                            <Setter TargetName="ActionDivider"
+                                                    Property="IsVisible"
+                                                    Value="False" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="{StaticResource PrimaryLight}" />
+                                            <Setter Property="Stroke" Value="{StaticResource Primary}" />
+                                            <Setter TargetName="ActionRow"
+                                                    Property="IsVisible"
+                                                    Value="True" />
+                                            <Setter TargetName="ActionDivider"
+                                                    Property="IsVisible"
+                                                    Value="True" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <VerticalStackLayout Spacing="8">
+                                <Grid ColumnDefinitions="*,Auto"
+                                      ColumnSpacing="8">
+                                    <VerticalStackLayout Spacing="4"
+                                                         VerticalOptions="Center">
+                                        <Label Text="{Binding Name}"
+                                               FontFamily="OpenSansSemibold"
+                                               FontSize="16"
+                                               TextColor="{StaticResource TextPrimary}" />
+                                        <Label Text="{Binding Address}"
+                                               Style="{StaticResource BodySecondary}"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="2" />
+                                        <Label Text="{Binding ContactEmail}"
+                                               Style="{StaticResource Caption}" />
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1"
+                                           Text="›"
+                                           FontSize="22"
+                                           TextColor="{StaticResource TextSecondary}"
+                                           VerticalOptions="Center" />
+                                </Grid>
+
+                                <BoxView HeightRequest="1"
+                                         Color="{StaticResource Border}"
+                                         x:Name="ActionDivider"
+                                         IsVisible="False"
+                                         Opacity="0.6" />
+
+                                <Grid x:Name="ActionRow"
+                                      ColumnDefinitions="*,*"
+                                      ColumnSpacing="{StaticResource SpacingSmall}"
+                                      IsVisible="False">
+                                    <Button Grid.Column="0"
+                                            Text="Bewerken"
+                                            Style="{StaticResource SecondaryButton}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type views:CustomersPage}}, Path=BindingContext.EditSelectedCustomerCommand}" />
+                                    <Button Grid.Column="1"
+                                            Text="Verwijderen"
+                                            Style="{StaticResource DangerButton}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type views:CustomersPage}}, Path=BindingContext.DeleteSelectedCustomerCommand}" />
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <views:CustomersMapView IsVisible="{Binding IsMapView}"
+                                    IsNativeMapVisible="{Binding IsNativeMapVisible}"
+                                    IsWebMapVisible="{Binding IsWebMapVisible}"
+                                    WebMapHtml="{Binding Map.WebMapHtml}"
+                                    Markers="{Binding Map.Markers}"
+                                    MarkerSelectedCommand="{Binding SelectMapMarkerCommand}" />
+
+            <ScrollView IsVisible="{Binding IsCreateView}">
+                <Border Style="{StaticResource AppCard}"
+                        Margin="0,0,0,8">
+                    <views:CustomerFormView BindingContext="{Binding Form}"
+                                            SaveCommand="{Binding SaveCreateCustomerCommand}"
+                                            CancelCommand="{Binding CancelCreateCommand}" />
+                </Border>
+            </ScrollView>
+        </Grid>
+    </Grid>
+</ContentPage>

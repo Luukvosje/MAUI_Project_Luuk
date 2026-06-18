@@ -24,6 +24,17 @@ public sealed class WorkSessionRepository : IWorkSessionRepository
             .ToListAsync();
     }
 
+    public async Task<IReadOnlyList<WorkSession>> GetAllWithSegmentsByUserIdAsync(Guid userId)
+    {
+        return await _remoteContext.WorkSessions
+            .AsNoTracking()
+            .Where(session => session.UserId == userId)
+            .Include(session => session.DrivingSegments)
+            .Include(session => session.StationarySegments)
+            .OrderByDescending(session => session.StartTimeUtc)
+            .ToListAsync();
+    }
+
     public async Task<WorkSession?> GetByIdWithDetailsAsync(Guid id, Guid userId)
     {
         return await _remoteContext.WorkSessions
