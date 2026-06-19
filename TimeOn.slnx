@@ -10,5 +10,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/TimeOn.UnitTests/TimeOn.UnitTests.csproj" />
+    <Project Path="tests/TimeOn.UITests/TimeOn.UITests.csproj" />
   </Folder>
 </Solution>
