@@ -30,7 +30,7 @@ public partial class LoginPage : ContentPage
 
         if (!string.IsNullOrWhiteSpace(_viewModel.ErrorMessage))
         {
-            await DisplayAlertAsync("Fout", _viewModel.ErrorMessage, "OK");
+            await DisplayAlertAsync("Error", _viewModel.ErrorMessage, "OK");
         }
     }
 }

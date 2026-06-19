@@ -74,10 +74,10 @@ public partial class NotificationService
 
         var channel = new NotificationChannel(
             AlertChannelId,
-            "Rijmeldingen",
+            "Driving alerts",
             NotificationImportance.Default)
         {
-            Description = "Meldingen wanneer rijden of een stop wordt gedetecteerd tijdens registratie."
+            Description = "Alerts when driving or a stop is detected during tracking."
         };
 
         manager?.CreateNotificationChannel(channel);

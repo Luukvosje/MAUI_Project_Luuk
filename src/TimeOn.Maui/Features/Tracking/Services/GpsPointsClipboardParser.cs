@@ -14,7 +14,7 @@ public static class GpsPointsClipboardParser
     {
         if (string.IsNullOrWhiteSpace(json))
         {
-            throw new InvalidOperationException("GPS-JSON is leeg.");
+            throw new InvalidOperationException("GPS JSON is empty.");
         }
 
         var trimmed = json.Trim();
@@ -27,13 +27,13 @@ public static class GpsPointsClipboardParser
         catch (JsonException ex)
         {
             throw new InvalidOperationException(
-                "Invoer is geen geldige JSON-array van GPS-punten.",
+                "Input is not a valid JSON array of GPS points.",
                 ex);
         }
 
         if (points is null || points.Count == 0)
         {
-            throw new InvalidOperationException("Geen GPS-punten gevonden in JSON.");
+            throw new InvalidOperationException("No GPS points found in JSON.");
         }
 
         var invalid = points.FirstOrDefault(point =>
@@ -44,7 +44,7 @@ public static class GpsPointsClipboardParser
         if (invalid is not null)
         {
             throw new InvalidOperationException(
-                "Elk GPS-punt heeft latitude, longitude en recordedAtUtc nodig.");
+                "Each GPS point needs latitude, longitude, and recordedAtUtc.");
         }
 
         return points

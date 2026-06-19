@@ -35,7 +35,7 @@ public sealed class CustomersMapPresentationService : ICustomersMapPresentationS
             var id = marker.Id.ToString();
 
             markerScript.AppendLine(
-                $"L.marker([{lat}, {lng}]).addTo(map).bindPopup('{name}<br/>{address}<br/><a href=\"{MarkerUrlPrefix}{id}\">Acties openen</a>');");
+                $"L.marker([{lat}, {lng}]).addTo(map).bindPopup('{name}<br/>{address}<br/><a href=\"{MarkerUrlPrefix}{id}\">Open actions</a>');");
         }
 
         var defaultLat = DefaultLatitude.ToString(CultureInfo.InvariantCulture);

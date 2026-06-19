@@ -94,18 +94,18 @@ public sealed class ApiService : IApiService
         if (OperatingSystem.IsAndroid())
         {
             var message =
-                $"Kan de API niet bereiken op {baseUrl}." +
+                $"Cannot reach the API at {baseUrl}." +
                 (string.IsNullOrWhiteSpace(detail) ? string.Empty : $" ({detail})") +
-                " Start TimeOn.Api op je pc (luistert op http://0.0.0.0:5000)." +
-                " De emulator gebruikt http://10.0.2.2:5000 om de hostmachine te bereiken." +
-                " Fysiek apparaat op Wi-Fi: stel het LAN-IP van je pc in via appsettings.android.json (bijv. http://192.168.x.x:5000/).";
+                " Start TimeOn.Api on your PC (listening on http://0.0.0.0:5000)." +
+                " The emulator uses http://10.0.2.2:5000 to reach the host machine." +
+                " Physical device on Wi-Fi: set your PC LAN IP in appsettings.android.json (e.g. http://192.168.x.x:5000/).";
 
             return message;
         }
 
-        return $"Kan de API niet bereiken op {baseUrl}." +
+        return $"Cannot reach the API at {baseUrl}." +
                (string.IsNullOrWhiteSpace(detail) ? string.Empty : $" ({detail})") +
-               " Start TimeOn.Api op deze machine.";
+               " Start TimeOn.Api on this machine.";
     }
 
     private async Task<TResponse?> ReadSuccessResponseAsync<TResponse>(HttpResponseMessage response)
@@ -136,11 +136,11 @@ public sealed class ApiService : IApiService
 
         return response.StatusCode switch
         {
-            System.Net.HttpStatusCode.BadRequest => "Het verzoek was ongeldig.",
-            System.Net.HttpStatusCode.Unauthorized => "Je sessie is verlopen. Log opnieuw in.",
-            System.Net.HttpStatusCode.NotFound => "De gevraagde resource is niet gevonden.",
-            System.Net.HttpStatusCode.InternalServerError => "Er is een serverfout opgetreden.",
-            _ => $"Verzoek mislukt ({(int)response.StatusCode})."
+            System.Net.HttpStatusCode.BadRequest => "The request was invalid.",
+            System.Net.HttpStatusCode.Unauthorized => "Your session has expired. Please sign in again.",
+            System.Net.HttpStatusCode.NotFound => "The requested resource was not found.",
+            System.Net.HttpStatusCode.InternalServerError => "A server error occurred.",
+            _ => $"Request failed ({(int)response.StatusCode})."
         };
     }
 

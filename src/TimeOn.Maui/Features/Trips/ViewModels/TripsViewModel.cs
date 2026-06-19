@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using TimeOn.Application.Features.WorkSessions.DTOs;
 using TimeOn.Application.Features.WorkSessions.Services;
 using TimeOn.Maui.Features.Trips.Views;
@@ -10,8 +9,6 @@ namespace TimeOn.Maui.Features.Trips.ViewModels;
 
 public partial class TripsViewModel : ObservableObject
 {
-    private static readonly CultureInfo DutchCulture = new("nl-NL");
-
     private readonly IWorkSessionService _workSessionService;
 
     public ObservableCollection<TripListItem> Sessions { get; } = [];
@@ -46,7 +43,7 @@ public partial class TripsViewModel : ObservableObject
             var result = await _workSessionService.GetAllAsync();
             if (!result.IsSuccess || result.Value is null)
             {
-                ErrorMessage = result.Error ?? "Kon ritten niet laden.";
+                ErrorMessage = result.Error ?? "Could not load trips.";
                 return;
             }
 
@@ -86,25 +83,16 @@ public partial class TripsViewModel : ObservableObject
         var start = session.StartTimeUtc.ToLocalTime();
         var end = session.EndTimeUtc?.ToLocalTime();
         var endLabel = end is null
-            ? "Bezig"
-            : $"Beëindigd {end:dd MMM yyyy HH:mm}";
+            ? "In progress"
+            : $"Ended {end:dd MMM yyyy HH:mm}";
 
         return new TripListItem(
             session.Id,
-            start.ToString("dd MMM yyyy HH:mm", DutchCulture),
+            start.ToString("dd MMM yyyy HH:mm"),
             endLabel,
-            TranslateStatus(session.Status),
+            session.Status,
             $"{session.TotalDistanceKm:F2} km");
     }
-
-    private static string TranslateStatus(string status) =>
-        status switch
-        {
-            "InProgress" => "Bezig",
-            "Completed" => "Voltooid",
-            "Draft" => "Concept",
-            _ => status
-        };
 
     private async Task ExecuteWithLoadingAsync(Func<Task> action, bool useRefreshIndicator)
     {
@@ -120,7 +108,7 @@ public partial class TripsViewModel : ObservableObject
         }
         catch (Exception)
         {
-            ErrorMessage = "Er is een onverwachte fout opgetreden.";
+            ErrorMessage = "An unexpected error occurred.";
         }
         finally
         {

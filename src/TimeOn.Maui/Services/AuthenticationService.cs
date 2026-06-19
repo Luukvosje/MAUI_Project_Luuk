@@ -68,7 +68,7 @@ public sealed class AuthenticationService : IAuthenticationService
 
             if (response is null)
             {
-                ErrorMessage = _apiService.LastError ?? "Inloggen mislukt.";
+                ErrorMessage = _apiService.LastError ?? "Login failed.";
                 IsAuthenticated = false;
                 return false;
             }
@@ -79,7 +79,7 @@ public sealed class AuthenticationService : IAuthenticationService
         }
         catch (Exception)
         {
-            ErrorMessage = _apiService.LastError ?? "Inloggen mislukt.";
+            ErrorMessage = _apiService.LastError ?? "Login failed.";
             IsAuthenticated = false;
             return false;
         }
@@ -97,7 +97,7 @@ public sealed class AuthenticationService : IAuthenticationService
 
             if (response is null)
             {
-                ErrorMessage = _apiService.LastError ?? "Registratie mislukt.";
+                ErrorMessage = _apiService.LastError ?? "Registration failed.";
                 IsAuthenticated = false;
                 return false;
             }
@@ -108,7 +108,7 @@ public sealed class AuthenticationService : IAuthenticationService
         }
         catch (Exception)
         {
-            ErrorMessage = _apiService.LastError ?? "Registratie mislukt.";
+            ErrorMessage = _apiService.LastError ?? "Registration failed.";
             IsAuthenticated = false;
             return false;
         }

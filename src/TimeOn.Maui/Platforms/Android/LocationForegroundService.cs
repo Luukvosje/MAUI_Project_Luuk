@@ -188,10 +188,10 @@ public sealed class LocationForegroundService : Service, ILocationListener
 
         var channel = new NotificationChannel(
             ChannelId,
-            "GPS-registratie",
+            "GPS Tracking",
             NotificationImportance.Low)
         {
-            Description = "Wordt getoond terwijl een werksessie wordt geregistreerd."
+            Description = "Shows while a work session is being tracked."
         };
 
         manager?.CreateNotificationChannel(channel);
@@ -209,8 +209,8 @@ public sealed class LocationForegroundService : Service, ILocationListener
         var iconId = ApplicationInfo?.Icon ?? global::Android.Resource.Drawable.IcDialogInfo;
         var compatBuilder = new NotificationCompat.Builder(this, ChannelId)!;
         compatBuilder
-            .SetContentTitle("TimeOn-registratie actief")
-            .SetContentText("GPS-punten worden verzameld voor je werksessie")
+            .SetContentTitle("TimeOn tracking active")
+            .SetContentText("Collecting GPS points for your work session")
             .SetSmallIcon(iconId)
             .SetOngoing(true)
             .SetContentIntent(pendingIntent);

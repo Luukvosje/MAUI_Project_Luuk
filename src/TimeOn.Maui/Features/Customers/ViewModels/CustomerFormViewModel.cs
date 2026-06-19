@@ -36,7 +36,7 @@ public partial class CustomerFormViewModel : ObservableObject
     [ObservableProperty]
     public partial bool IsEmbedded { get; set; }
 
-    public string Title => IsEditMode ? "Klant bijwerken" : "Klant aanmaken";
+    public string Title => IsEditMode ? "Update customer" : "Create customer";
 
     public CustomerFormViewModel(ICustomerService customerService)
     {
@@ -82,7 +82,7 @@ public partial class CustomerFormViewModel : ObservableObject
                 var updateResult = await _customerService.UpdateCustomerAsync(customerId, update);
                 if (!updateResult.IsSuccess)
                 {
-                    ErrorMessage = updateResult.Error ?? "Kon klant niet bijwerken.";
+                    ErrorMessage = updateResult.Error ?? "Could not update customer.";
                     return;
                 }
             }
@@ -92,7 +92,7 @@ public partial class CustomerFormViewModel : ObservableObject
                 var createResult = await _customerService.CreateCustomerAsync(create);
                 if (!createResult.IsSuccess)
                 {
-                    ErrorMessage = createResult.Error ?? "Kon klant niet aanmaken.";
+                    ErrorMessage = createResult.Error ?? "Could not create customer.";
                     return;
                 }
             }
@@ -125,7 +125,7 @@ public partial class CustomerFormViewModel : ObservableObject
         }
         catch (Exception)
         {
-            ErrorMessage = "Er is een onverwachte fout opgetreden.";
+            ErrorMessage = "An unexpected error occurred.";
         }
         finally
         {

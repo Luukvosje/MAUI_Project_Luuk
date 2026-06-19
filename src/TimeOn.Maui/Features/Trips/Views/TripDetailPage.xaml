@@ -16,12 +16,12 @@
         <Grid Grid.Row="0"
               ColumnDefinitions="Auto,*,Auto"
               ColumnSpacing="8">
-            <Button Text="Terug"
+            <Button Text="Back"
                     Style="{StaticResource TextButton}"
                     HorizontalOptions="Start"
                     Command="{Binding GoBackCommand}" />
             <Button Grid.Column="2"
-                    Text="Verwijderen"
+                    Text="Delete"
                     Style="{StaticResource TextDangerButton}"
                     HorizontalOptions="End"
                     Command="{Binding DeleteCommand}" />
@@ -43,7 +43,7 @@
                     <VerticalStackLayout Grid.Row="0"
                                          Grid.Column="0"
                                          Spacing="4">
-                        <Label Text="Gestart"
+                        <Label Text="Started"
                                Style="{StaticResource Caption}" />
                         <Label Text="{Binding StartLabel}"
                                FontFamily="OpenSansSemibold"
@@ -52,7 +52,7 @@
                     <VerticalStackLayout Grid.Row="0"
                                          Grid.Column="1"
                                          Spacing="4">
-                        <Label Text="Beëindigd"
+                        <Label Text="Ended"
                                Style="{StaticResource Caption}" />
                         <Label Text="{Binding EndLabel}"
                                FontFamily="OpenSansSemibold"
@@ -70,7 +70,7 @@
                     <VerticalStackLayout Grid.Row="1"
                                          Grid.Column="1"
                                          Spacing="4">
-                        <Label Text="Totale afstand"
+                        <Label Text="Total distance"
                                Style="{StaticResource Caption}" />
                         <Label Text="{Binding TotalDistanceKm, StringFormat='{0:F2} km'}"
                                FontFamily="OpenSansSemibold"
@@ -82,7 +82,7 @@
 
         <ScrollView Grid.Row="2">
             <VerticalStackLayout Spacing="{StaticResource SpacingSmall}">
-                <Label Text="Segmenten"
+                <Label Text="Segments"
                        Style="{StaticResource SectionTitle}"
                        Margin="0,4,0,0" />
 
@@ -93,7 +93,7 @@
                                            ItemSpacing="{StaticResource SpacingMedium}" />
                     </CollectionView.ItemsLayout>
                     <CollectionView.EmptyView>
-                        <Label Text="Geen segmenten geregistreerd voor deze rit."
+                        <Label Text="No segments recorded for this trip."
                                Style="{StaticResource BodySecondary}"
                                Margin="0,16,0,0" />
                     </CollectionView.EmptyView>
@@ -123,7 +123,7 @@
                                         </Border>
                                     </Grid>
 
-                                    <Label Text="Einde"
+                                    <Label Text="End"
                                            Style="{StaticResource Caption}" />
                                     <Grid ColumnDefinitions="*,*"
                                           ColumnSpacing="{StaticResource SpacingSmall}">
@@ -138,7 +138,7 @@
 
                                     <VerticalStackLayout IsVisible="{Binding IsDriving}"
                                                          Spacing="4">
-                                        <Label Text="Afstand (km)"
+                                        <Label Text="Distance (km)"
                                                Style="{StaticResource Caption}" />
                                         <Border Style="{StaticResource FormEntryBorder}">
                                             <Entry Text="{Binding DistanceKmText}"
@@ -149,7 +149,7 @@
 
                                     <VerticalStackLayout IsVisible="{Binding IsStationary}"
                                                          Spacing="4">
-                                        <Label Text="Klant"
+                                        <Label Text="Customer"
                                                Style="{StaticResource Caption}" />
                                         <Border Style="{StaticResource FormEntryBorder}">
                                             <Picker ItemsSource="{Binding Source={RelativeSource AncestorType={x:Type views:TripDetailPage}}, Path=BindingContext.CustomerOptions}"
@@ -158,7 +158,7 @@
                                         </Border>
                                     </VerticalStackLayout>
 
-                                    <Button Text="Segment opslaan"
+                                    <Button Text="Save segment"
                                             Style="{StaticResource CompactSecondaryButton}"
                                             Margin="0,8,0,0"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type views:TripDetailPage}}, Path=BindingContext.SaveSegmentCommand}"

@@ -23,12 +23,12 @@ public sealed class RemoteWorkSessionService : IWorkSessionService
                 $"{WorkSessionsEndpoint}/complete",
                 request);
             return response is null
-                ? Result<CompleteWorkSessionResponse>.Failure(_apiService.LastError ?? "Kon werksessie niet voltooien.")
+                ? Result<CompleteWorkSessionResponse>.Failure(_apiService.LastError ?? "Could not complete work session.")
                 : Result<CompleteWorkSessionResponse>.Success(response);
         }
         catch (Exception)
         {
-            return Result<CompleteWorkSessionResponse>.Failure(_apiService.LastError ?? "Kon werksessie niet voltooien.");
+            return Result<CompleteWorkSessionResponse>.Failure(_apiService.LastError ?? "Could not complete work session.");
         }
     }
 
@@ -38,12 +38,12 @@ public sealed class RemoteWorkSessionService : IWorkSessionService
         {
             var sessions = await _apiService.GetAsync<IReadOnlyList<WorkSessionListItemDto>>(WorkSessionsEndpoint);
             return sessions is null
-                ? Result<IReadOnlyList<WorkSessionListItemDto>>.Failure(_apiService.LastError ?? "Kon werksessies niet laden.")
+                ? Result<IReadOnlyList<WorkSessionListItemDto>>.Failure(_apiService.LastError ?? "Could not load work sessions.")
                 : Result<IReadOnlyList<WorkSessionListItemDto>>.Success(sessions);
         }
         catch (Exception)
         {
-            return Result<IReadOnlyList<WorkSessionListItemDto>>.Failure(_apiService.LastError ?? "Kon werksessies niet laden.");
+            return Result<IReadOnlyList<WorkSessionListItemDto>>.Failure(_apiService.LastError ?? "Could not load work sessions.");
         }
     }
 
@@ -53,12 +53,12 @@ public sealed class RemoteWorkSessionService : IWorkSessionService
         {
             var session = await _apiService.GetAsync<WorkSessionDetailDto>($"{WorkSessionsEndpoint}/{id}");
             return session is null
-                ? Result<WorkSessionDetailDto>.Failure(_apiService.LastError ?? "Kon werksessie niet laden.")
+                ? Result<WorkSessionDetailDto>.Failure(_apiService.LastError ?? "Could not load work session.")
                 : Result<WorkSessionDetailDto>.Success(session);
         }
         catch (Exception)
         {
-            return Result<WorkSessionDetailDto>.Failure(_apiService.LastError ?? "Kon werksessie niet laden.");
+            return Result<WorkSessionDetailDto>.Failure(_apiService.LastError ?? "Could not load work session.");
         }
     }
 
@@ -73,7 +73,7 @@ public sealed class RemoteWorkSessionService : IWorkSessionService
         }
         catch (Exception)
         {
-            return Result.Failure(_apiService.LastError ?? "Kon werksessie niet verwijderen.");
+            return Result.Failure(_apiService.LastError ?? "Could not delete work session.");
         }
     }
 
@@ -89,12 +89,12 @@ public sealed class RemoteWorkSessionService : IWorkSessionService
                 request);
 
             return segment is null
-                ? Result<WorkSessionSegmentDto>.Failure(_apiService.LastError ?? "Kon segment niet bijwerken.")
+                ? Result<WorkSessionSegmentDto>.Failure(_apiService.LastError ?? "Could not update segment.")
                 : Result<WorkSessionSegmentDto>.Success(segment);
         }
         catch (Exception)
         {
-            return Result<WorkSessionSegmentDto>.Failure(_apiService.LastError ?? "Kon segment niet bijwerken.");
+            return Result<WorkSessionSegmentDto>.Failure(_apiService.LastError ?? "Could not update segment.");
         }
     }
 }

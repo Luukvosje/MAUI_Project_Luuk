@@ -20,7 +20,7 @@
 		<MauiXamlInflator>SourceGen</MauiXamlInflator>
 
 		<!-- Display name -->
-		<ApplicationTitle>TimeOn</ApplicationTitle>
+		<ApplicationTitle>TimeOn.Maui</ApplicationTitle>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.companyname.timeon.maui</ApplicationId>

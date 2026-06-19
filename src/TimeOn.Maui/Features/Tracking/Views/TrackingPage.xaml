@@ -4,7 +4,7 @@
              xmlns:vm="clr-namespace:TimeOn.Maui.Features.Tracking.ViewModels"
              x:Class="TimeOn.Maui.Features.Tracking.Views.TrackingPage"
              x:DataType="vm:TrackingViewModel"
-             Title="Registratie"
+             Title="Tracking"
              SafeAreaEdges="All">
 
     <ScrollView>
@@ -39,10 +39,10 @@
                            FontSize="16"
                            TextColor="{StaticResource TextPrimary}"
                            LineBreakMode="WordWrap" />
-                    <Label Text="GPS-punten worden opgeslagen zolang registratie actief is."
+                    <Label Text="GPS points are recorded while tracking is active."
                            Style="{StaticResource BodySecondary}"
                            IsVisible="{Binding IsTracking}" />
-                    <Label Text="Druk op Start om een nieuwe werksessie te beginnen."
+                    <Label Text="Press Start to begin a new work session."
                            Style="{StaticResource BodySecondary}">
                         <Label.Triggers>
                             <DataTrigger TargetType="Label"
@@ -61,12 +61,12 @@
 
             <Border Style="{StaticResource AppCard}">
                 <VerticalStackLayout Spacing="{StaticResource SpacingSmall}">
-                    <Label Text="Bediening"
+                    <Label Text="Controls"
                            Style="{StaticResource SectionTitle}" />
-                    <Button Text="Registratie starten"
+                    <Button Text="Start tracking"
                             Style="{StaticResource PrimaryButton}"
                             Command="{Binding StartCommand}" />
-                    <Button Text="Registratie stoppen"
+                    <Button Text="Stop tracking"
                             Style="{StaticResource DangerButton}"
                             Command="{Binding StopCommand}" />
                 </VerticalStackLayout>
@@ -75,19 +75,19 @@
             <Border Style="{StaticResource AppCard}"
                     IsVisible="{Binding ShowDevelopmentTools}">
                 <VerticalStackLayout Spacing="{StaticResource SpacingSmall}">
-                    <Label Text="Ontwikkeling"
+                    <Label Text="Development"
                            Style="{StaticResource SectionTitle}" />
-                    <Label Text="Plak de volledige inhoud van points.json (JSON-array)."
+                    <Label Text="Paste the full contents of points.json (JSON array)."
                            Style="{StaticResource BodySecondary}" />
                     <Border Style="{StaticResource FormEntryBorder}"
                             Padding="12">
                         <Editor Text="{Binding GpsPointsJson}"
-                                Placeholder="Plak hier de JSON-array uit points.json"
+                                Placeholder="Paste the JSON array from points.json here"
                                 HeightRequest="280"
                                 IsSpellCheckEnabled="False"
                                 IsTextPredictionEnabled="False" />
                     </Border>
-                    <Button Text="Werksessie opslaan"
+                    <Button Text="Save work session"
                             Style="{StaticResource SecondaryButton}"
                             Command="{Binding SaveImportedWorkSessionCommand}" />
                 </VerticalStackLayout>

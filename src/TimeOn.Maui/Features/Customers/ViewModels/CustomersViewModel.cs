@@ -103,7 +103,7 @@ public partial class CustomersViewModel : ObservableObject
             var result = await _customerService.GetCustomersAsync();
             if (!result.IsSuccess || result.Value is null)
             {
-                ErrorMessage = result.Error ?? "Kon klanten niet laden.";
+                ErrorMessage = result.Error ?? "Could not load customers.";
                 return;
             }
 
@@ -152,7 +152,7 @@ public partial class CustomersViewModel : ObservableObject
     {
         if (SelectedCustomer == null)
         {
-            ErrorMessage = "Selecteer eerst een klant.";
+            ErrorMessage = "Select a customer first.";
             return;
         }
 
@@ -164,7 +164,7 @@ public partial class CustomersViewModel : ObservableObject
     {
         if (SelectedCustomer == null)
         {
-            ErrorMessage = "Selecteer eerst een klant.";
+            ErrorMessage = "Select a customer first.";
             return;
         }
 
@@ -194,7 +194,7 @@ public partial class CustomersViewModel : ObservableObject
         }
         catch (Exception)
         {
-            ErrorMessage = "Er is een onverwachte fout opgetreden.";
+            ErrorMessage = "An unexpected error occurred.";
         }
         finally
         {
@@ -218,7 +218,7 @@ public partial class CustomersViewModel : ObservableObject
             var result = await _customerService.DeleteCustomerAsync(customer.Id);
             if (!result.IsSuccess)
             {
-                ErrorMessage = result.Error ?? "Kon klant niet verwijderen.";
+                ErrorMessage = result.Error ?? "Could not delete customer.";
                 return;
             }
 

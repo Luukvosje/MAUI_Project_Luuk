@@ -23,12 +23,12 @@ public sealed class RemoteDashboardSummaryService : IDashboardSummaryService
                 $"{SummaryEndpoint}?utcOffsetMinutes={utcOffsetMinutes}");
 
             return response is null
-                ? Result<DashboardSummaryResponseDto>.Failure(_apiService.LastError ?? "Kon dashboardoverzicht niet laden.")
+                ? Result<DashboardSummaryResponseDto>.Failure(_apiService.LastError ?? "Could not load dashboard summary.")
                 : Result<DashboardSummaryResponseDto>.Success(response);
         }
         catch (Exception)
         {
-            return Result<DashboardSummaryResponseDto>.Failure(_apiService.LastError ?? "Kon dashboardoverzicht niet laden.");
+            return Result<DashboardSummaryResponseDto>.Failure(_apiService.LastError ?? "Could not load dashboard summary.");
         }
     }
 }

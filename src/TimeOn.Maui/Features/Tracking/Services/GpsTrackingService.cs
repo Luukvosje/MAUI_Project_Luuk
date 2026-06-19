@@ -63,13 +63,13 @@ public sealed class GpsTrackingService : IGpsTrackingService
             var permission = await RequestLocationPermissionAsync();
             if (permission != PermissionStatus.Granted)
             {
-                throw new InvalidOperationException("Locatietoestemming is vereist om registratie te starten.");
+                throw new InvalidOperationException("Location permission is required to start tracking.");
             }
 
             var userId = await ResolveUserIdAsync();
             if (userId == Guid.Empty)
             {
-                throw new InvalidOperationException("Je moet ingelogd zijn om registratie te starten.");
+                throw new InvalidOperationException("You must be logged in to start tracking.");
             }
 
             _activeSession = await _gpsStore.GetActiveSessionAsync(userId);
@@ -199,7 +199,7 @@ public sealed class GpsTrackingService : IGpsTrackingService
     {
         if (gpsPoints.Count == 0)
         {
-            throw new InvalidOperationException("Minimaal één GPS-punt is vereist.");
+            throw new InvalidOperationException("At least one GPS point is required.");
         }
 
         await _lifecycleLock.WaitAsync();
@@ -207,13 +207,13 @@ public sealed class GpsTrackingService : IGpsTrackingService
         {
             if (State == TrackingState.Running)
             {
-                throw new InvalidOperationException("Stop registratie voordat je geïmporteerde GPS-punten verstuurt.");
+                throw new InvalidOperationException("Stop tracking before submitting imported GPS points.");
             }
 
             var userId = await ResolveUserIdAsync();
             if (userId == Guid.Empty)
             {
-                throw new InvalidOperationException("Je moet ingelogd zijn om een werksessie op te slaan.");
+                throw new InvalidOperationException("You must be logged in to save a work session.");
             }
 
             var ordered = gpsPoints.OrderBy(point => point.RecordedAtUtc).ToList();
@@ -282,8 +282,8 @@ public sealed class GpsTrackingService : IGpsTrackingService
                 var locationText =
                     $"{point.Location.Latitude:F6}, {point.Location.Longitude:F6}";
                 await _notificationService.ShowLocalNotificationAsync(
-                    "Locatie opgeslagen",
-                    $"Opgeslagen op {locationText}");
+                    "Location saved",
+                    $"Saved at {locationText}");
             }
         }
         catch (Exception exception)
@@ -315,8 +315,8 @@ public sealed class GpsTrackingService : IGpsTrackingService
                     _activeSession.Id,
                     effectiveSpeedKmh);
                 await _notificationService.ShowLocalNotificationAsync(
-                    "Rijden gedetecteerd",
-                    "Afstandsregistratie is weer actief.");
+                    "Driving detected",
+                    "Distance tracking is active again.");
                 break;
             case DrivingStateTransition.Stopped:
                 _logger.LogInformation(
@@ -324,8 +324,8 @@ public sealed class GpsTrackingService : IGpsTrackingService
                     _activeSession.Id,
                     effectiveSpeedKmh);
                 await _notificationService.ShowLocalNotificationAsync(
-                    "Stop gedetecteerd",
-                    "Je lijkt stil te staan.");
+                    "Stop detected",
+                    "You appear to be stationary.");
                 break;
         }
     }
@@ -349,7 +349,7 @@ public sealed class GpsTrackingService : IGpsTrackingService
         if (response is null)
         {
             throw new InvalidOperationException(
-                _apiService.LastError ?? "Kon werksessie niet naar de API versturen.");
+                _apiService.LastError ?? "Failed to submit work session to the API.");
         }
 
         return response;

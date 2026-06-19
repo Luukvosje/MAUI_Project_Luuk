@@ -10,8 +10,6 @@ namespace TimeOn.Maui.Features.Trips.ViewModels;
 
 public partial class TripDetailViewModel : ObservableObject
 {
-    private static readonly CultureInfo DutchCulture = new("nl-NL");
-
     private readonly IWorkSessionService _workSessionService;
     private readonly ICustomerService _customerService;
 
@@ -40,7 +38,7 @@ public partial class TripDetailViewModel : ObservableObject
 
     public ObservableCollection<CustomerPickerItem> CustomerOptions { get; } = [];
 
-    public string Title { get; private set; } = "Rit";
+    public string Title { get; private set; } = "Trip";
 
     public TripDetailViewModel(
         IWorkSessionService workSessionService,
@@ -54,7 +52,7 @@ public partial class TripDetailViewModel : ObservableObject
     {
         if (SessionId == Guid.Empty)
         {
-            ErrorMessage = "Rit-id ontbreekt.";
+            ErrorMessage = "Trip id is missing.";
             return;
         }
 
@@ -74,18 +72,18 @@ public partial class TripDetailViewModel : ObservableObject
             var result = await _workSessionService.GetWorkSessionDetailsAsync(SessionId);
             if (!result.IsSuccess || result.Value is null)
             {
-                ErrorMessage = result.Error ?? "Kon rit niet laden.";
+                ErrorMessage = result.Error ?? "Could not load trip.";
                 return;
             }
 
             var trip = result.Value;
-            Status = TranslateStatus(trip.Status);
-            StartLabel = ToLocalTime(trip.StartTimeUtc).ToString("dd MMM yyyy HH:mm", DutchCulture);
+            Status = trip.Status;
+            StartLabel = ToLocalTime(trip.StartTimeUtc).ToString("dd MMM yyyy HH:mm");
             EndLabel = trip.EndTimeUtc is { } endUtc
-                ? ToLocalTime(endUtc).ToString("dd MMM yyyy HH:mm", DutchCulture)
-                : "Bezig";
+                ? ToLocalTime(endUtc).ToString("dd MMM yyyy HH:mm")
+                : "In progress";
             TotalDistanceKm = trip.TotalDistanceKm;
-            Title = $"Rit {ToLocalTime(trip.StartTimeUtc):dd MMM yyyy}";
+            Title = $"Trip {ToLocalTime(trip.StartTimeUtc):dd MMM yyyy}";
 
             Segments.Clear();
             foreach (var segment in trip.Segments)
@@ -113,7 +111,7 @@ public partial class TripDetailViewModel : ObservableObject
         if (segment.IsDriving &&
             !double.TryParse(segment.DistanceKmText, NumberStyles.Number, CultureInfo.InvariantCulture, out _))
         {
-            ErrorMessage = "Voer een geldige afstand in kilometers in.";
+            ErrorMessage = "Enter a valid distance in kilometers.";
             return;
         }
 
@@ -134,7 +132,7 @@ public partial class TripDetailViewModel : ObservableObject
             var result = await _workSessionService.UpdateSegmentAsync(SessionId, segment.Id, request);
             if (!result.IsSuccess || result.Value is null)
             {
-                ErrorMessage = result.Error ?? "Kon segment niet opslaan.";
+                ErrorMessage = result.Error ?? "Could not save segment.";
                 return;
             }
 
@@ -154,10 +152,10 @@ public partial class TripDetailViewModel : ObservableObject
     private async Task DeleteAsync()
     {
         var confirm = await Shell.Current.DisplayAlertAsync(
-            "Rit verwijderen",
-            "Weet je zeker dat je deze rit wilt verwijderen?",
-            "Verwijderen",
-            "Annuleren");
+            "Delete trip",
+            "Are you sure you want to delete this trip?",
+            "Delete",
+            "Cancel");
 
         if (!confirm)
         {
@@ -169,7 +167,7 @@ public partial class TripDetailViewModel : ObservableObject
             var result = await _workSessionService.DeleteAsync(SessionId);
             if (!result.IsSuccess)
             {
-                ErrorMessage = result.Error ?? "Kon rit niet verwijderen.";
+                ErrorMessage = result.Error ?? "Could not delete trip.";
                 return;
             }
 
@@ -216,6 +214,7 @@ public partial class TripDetailViewModel : ObservableObject
         return CustomerOptions.FirstOrDefault(option => option.Id == customerId)
             ?? CustomerPickerItem.None;
     }
+
     private static void ApplySavedSegment(SegmentListItem segment, WorkSessionSegmentDto savedSegment)
     {
         segment.StartLocal = ToLocalTime(savedSegment.StartUtc);
@@ -224,7 +223,6 @@ public partial class TripDetailViewModel : ObservableObject
         segment.CustomerName = savedSegment.CustomerName;
         segment.CustomerId = savedSegment.CustomerId;
     }
-
 
     private async Task RefreshTripSummaryAsync()
     {
@@ -236,18 +234,9 @@ public partial class TripDetailViewModel : ObservableObject
 
         TotalDistanceKm = result.Value.TotalDistanceKm;
         EndLabel = result.Value.EndTimeUtc is { } endUtc
-            ? ToLocalTime(endUtc).ToString("dd MMM yyyy HH:mm", DutchCulture)
-            : "Bezig";
+            ? ToLocalTime(endUtc).ToString("dd MMM yyyy HH:mm")
+            : "In progress";
     }
-
-    private static string TranslateStatus(string status) =>
-        status switch
-        {
-            "InProgress" => "Bezig",
-            "Completed" => "Voltooid",
-            "Draft" => "Concept",
-            _ => status
-        };
 
     private static DateTime ToLocalTime(DateTime utc) =>
         DateTime.SpecifyKind(utc, DateTimeKind.Utc).ToLocalTime();
@@ -265,7 +254,7 @@ public partial class TripDetailViewModel : ObservableObject
         }
         catch (Exception)
         {
-            ErrorMessage = "Er is een onverwachte fout opgetreden.";
+            ErrorMessage = "An unexpected error occurred.";
         }
         finally
         {
@@ -372,10 +361,10 @@ public partial class SegmentListItem : ObservableObject
 
     public string Title =>
         IsDriving
-            ? "Rijden"
+            ? "Driving"
             : string.IsNullOrWhiteSpace(CustomerName)
-                ? "Stilstand"
-                : $"Klantbezoek · {CustomerName}";
+                ? "Stationary"
+                : $"Customer visit · {CustomerName}";
 
     partial void OnCustomerNameChanged(string? value) => OnPropertyChanged(nameof(Title));
 
@@ -387,7 +376,7 @@ public partial class SegmentListItem : ObservableObject
 
 public sealed class CustomerPickerItem
 {
-    public static CustomerPickerItem None { get; } = new(null, "Geen");
+    public static CustomerPickerItem None { get; } = new(null, "None");
 
     public CustomerPickerItem(Guid? id, string name)
     {

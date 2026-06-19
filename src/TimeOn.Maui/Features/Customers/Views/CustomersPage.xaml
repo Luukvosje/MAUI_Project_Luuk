@@ -7,7 +7,7 @@
              x:Class="TimeOn.Maui.Features.Customers.Views.CustomersPage"
              x:Name="CustomersPageRoot"
              x:DataType="vm:CustomersViewModel"
-             Title="Klanten"
+             Title="Customers"
              SafeAreaEdges="All">
 
     <Grid Padding="{StaticResource PageContentPadding}"
@@ -19,7 +19,7 @@
             <Grid ColumnDefinitions="*,*,*"
                   ColumnSpacing="4">
                 <Button Grid.Column="0"
-                        Text="Lijst"
+                        Text="List"
                         Style="{StaticResource SegmentToggleButton}"
                         Command="{Binding ShowListCommand}">
                     <Button.Triggers>
@@ -32,7 +32,7 @@
                     </Button.Triggers>
                 </Button>
                 <Button Grid.Column="1"
-                        Text="Kaart"
+                        Text="Map"
                         Style="{StaticResource SegmentToggleButton}"
                         Command="{Binding ShowMapCommand}">
                     <Button.Triggers>
@@ -45,7 +45,7 @@
                     </Button.Triggers>
                 </Button>
                 <Button Grid.Column="2"
-                        Text="Nieuw"
+                        Text="Create"
                         Style="{StaticResource SegmentToggleButton}"
                         Command="{Binding ShowCreateCommand}">
                     <Button.Triggers>
@@ -79,7 +79,7 @@
                                        ItemSpacing="{StaticResource SpacingSmall}" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.EmptyView>
-                    <Label Text="Nog geen klanten."
+                    <Label Text="No customers yet."
                            Style="{StaticResource BodySecondary}"
                            HorizontalOptions="Center"
                            Margin="0,40,0,0" />
@@ -147,11 +147,11 @@
                                       ColumnSpacing="{StaticResource SpacingSmall}"
                                       IsVisible="False">
                                     <Button Grid.Column="0"
-                                            Text="Bewerken"
+                                            Text="Edit"
                                             Style="{StaticResource SecondaryButton}"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type views:CustomersPage}}, Path=BindingContext.EditSelectedCustomerCommand}" />
                                     <Button Grid.Column="1"
-                                            Text="Verwijderen"
+                                            Text="Delete"
                                             Style="{StaticResource DangerButton}"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type views:CustomersPage}}, Path=BindingContext.DeleteSelectedCustomerCommand}" />
                                 </Grid>

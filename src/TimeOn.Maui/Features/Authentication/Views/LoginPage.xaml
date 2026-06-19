@@ -25,7 +25,7 @@
                        FontSize="28"
                        HorizontalOptions="Center"
                        HorizontalTextAlignment="Center" />
-                <Label Text="Log in om je werkdag bij te houden"
+                <Label Text="Sign in to track your work day"
                        TextColor="{StaticResource White}"
                        Opacity="0.9"
                        FontSize="14"
@@ -39,20 +39,20 @@
                                  Spacing="{StaticResource SpacingMedium}">
                 <Border Style="{StaticResource AppCard}">
                     <VerticalStackLayout Spacing="{StaticResource SpacingSmall}">
-                        <Label Text="E-mail"
+                        <Label Text="Email"
                                Style="{StaticResource SectionTitle}" />
                         <Border Style="{StaticResource FormEntryBorder}">
                             <Entry Text="{Binding Email}"
-                                   Placeholder="naam@bedrijf.nl"
+                                   Placeholder="you@company.com"
                                    Keyboard="Email" />
                         </Border>
 
-                        <Label Text="Wachtwoord"
+                        <Label Text="Password"
                                Style="{StaticResource SectionTitle}"
                                Margin="0,8,0,0" />
                         <Border Style="{StaticResource FormEntryBorder}">
                             <Entry Text="{Binding Password}"
-                                   Placeholder="Je wachtwoord"
+                                   Placeholder="Your password"
                                    IsPassword="True" />
                         </Border>
 
@@ -62,10 +62,10 @@
                     </VerticalStackLayout>
                 </Border>
 
-                <Button Text="Inloggen"
+                <Button Text="Sign in"
                         Style="{StaticResource PrimaryButton}"
                         Command="{Binding LoginCommand}" />
-                <Button Text="Account aanmaken"
+                <Button Text="Create an account"
                         Style="{StaticResource SecondaryButton}"
                         Command="{Binding GoToRegisterCommand}" />
 

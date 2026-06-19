@@ -12,10 +12,7 @@ namespace TimeOn.Api.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/[controller]")]
-public sealed class WorkSessionsController(
-    AppDbContext dbContext,
-    IWorkSessionService workSessionService,
-    ICurrentUserAccessor currentUserAccessor) : ControllerBase
+public sealed class WorkSessionsController(AppDbContext dbContext, IWorkSessionService workSessionService, ICurrentUserAccessor currentUserAccessor) : ControllerBase
 {
     [HttpPost("complete")]
     public async Task<IActionResult> Complete([FromBody] CompleteWorkSessionRequest request)

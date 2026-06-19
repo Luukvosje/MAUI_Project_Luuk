@@ -15,7 +15,7 @@ public partial class TrackingViewModel : ObservableObject
     public partial bool IsTracking { get; set; }
 
     [ObservableProperty]
-    public partial string StatusText { get; set; } = "Registratie is inactief.";
+    public partial string StatusText { get; set; } = "Tracking is idle.";
 
     [ObservableProperty]
     public partial string? ErrorMessage { get; set; }
@@ -78,8 +78,8 @@ public partial class TrackingViewModel : ObservableObject
             var result = await _gpsTrackingService.StopAsync();
             UpdateFromService();
             StatusText = result.SubmittedToApi
-                ? $"Werksessie opgeslagen ({result.GpsPointCount} GPS-punten)."
-                : "Registratie gestopt. Er zijn geen GPS-punten geregistreerd, dus er is niets naar de server verzonden.";
+                ? $"Work session saved ({result.GpsPointCount} GPS points)."
+                : "Tracking stopped. No GPS points were recorded, so nothing was sent to the server.";
         }
         catch (Exception exception)
         {
@@ -102,7 +102,7 @@ public partial class TrackingViewModel : ObservableObject
             GpsPointsJson = null;
             SaveImportedWorkSessionCommand.NotifyCanExecuteChanged();
             StatusText =
-                $"Werksessie opgeslagen ({response.TotalDistanceKm:F2} km, {response.DrivingSegmentCount} rijden, {response.StationarySegmentCount} stilstand).";
+                $"Work session saved ({response.TotalDistanceKm:F2} km, {response.DrivingSegmentCount} driving, {response.StationarySegmentCount} stationary).";
         }
         catch (Exception exception)
         {
@@ -159,11 +159,11 @@ public partial class TrackingViewModel : ObservableObject
         IsTracking = _gpsTrackingService.State == TrackingState.Running;
         if (!IsTracking)
         {
-            StatusText = "Registratie is inactief.";
+            StatusText = "Tracking is idle.";
         }
         else
         {
-            StatusText = $"Registratie actief (sessie {_gpsTrackingService.CurrentSessionId})";
+            StatusText = $"Tracking active (session {_gpsTrackingService.CurrentSessionId})";
         }
 
         StartCommand.NotifyCanExecuteChanged();

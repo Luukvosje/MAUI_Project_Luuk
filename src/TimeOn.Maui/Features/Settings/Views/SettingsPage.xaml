@@ -4,28 +4,28 @@
              xmlns:vm="clr-namespace:TimeOn.Maui.Features.Settings.ViewModels"
              x:Class="TimeOn.Maui.Features.Settings.Views.SettingsPage"
              x:DataType="vm:SettingsViewModel"
-             Title="Instellingen">
+             Title="Settings">
 
     <VerticalStackLayout Padding="24" Spacing="16">
         <VerticalStackLayout Spacing="8">
-            <Label Text="GPS-meldingen"
+            <Label Text="GPS notifications"
                    FontSize="18"
                    FontAttributes="Bold" />
-            <Label Text="Toon een melding telkens wanneer een GPS-punt wordt opgeslagen tijdens registratie."
+            <Label Text="Show a notification each time a GPS point is saved while tracking."
                    Style="{StaticResource Caption}" />
             <Switch IsToggled="{Binding AreGpsSaveNotificationsEnabled}" />
         </VerticalStackLayout>
 
         <VerticalStackLayout Spacing="8"
                              IsVisible="{Binding IsDevelopmentModeSupported}">
-            <Label Text="Ontwikkelmodus"
+            <Label Text="Development mode"
                    FontSize="18"
                    FontAttributes="Bold" />
-            <Label Text="Schakel GPS-plakken en ontwikkeltools in op de pagina Registratie (alleen Windows)."
+            <Label Text="Enable GPS paste and dev tools on the Tracking page (Windows only)."
                    Style="{StaticResource Caption}" />
             <Switch IsToggled="{Binding IsDevelopmentModeEnabled}" />
         </VerticalStackLayout>
 
-        <Button Text="Uitloggen" Command="{Binding LogoutCommand}" />
+        <Button Text="Logout" Command="{Binding LogoutCommand}" />
     </VerticalStackLayout>
 </ContentPage>

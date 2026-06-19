@@ -50,7 +50,7 @@ public partial class LoginViewModel : ObservableObject
             var success = await _authenticationService.LoginAsync(Email, Password);
             if (!success)
             {
-                ErrorMessage = _authenticationService.ErrorMessage ?? "Inloggen mislukt.";
+                ErrorMessage = _authenticationService.ErrorMessage ?? "Login failed.";
                 return;
             }
 

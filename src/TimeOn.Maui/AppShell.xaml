@@ -9,14 +9,14 @@
     <ShellContent
         x:Name="LoginShell"
         Route="LoginPage"
-        Title="Inloggen" />
+        Title="Login" />
 
     <TabBar x:Name="MainTabBar" Route="main">
-        <ShellContent x:Name="DashboardShell" Route="DashboardPage" Title="Overzicht" />
-        <ShellContent x:Name="TripsShell" Route="TripsPage" Title="Ritten" />
-        <ShellContent x:Name="CustomersShell" Route="CustomersPage" Title="Klanten" />
-        <ShellContent x:Name="TrackingShell" Route="TrackingPage" Title="Registratie" />
-        <ShellContent x:Name="SettingsShell" Route="SettingsPage" Title="Instellingen" />
+        <ShellContent x:Name="DashboardShell" Route="DashboardPage" Title="Dashboard" />
+        <ShellContent x:Name="TripsShell" Route="TripsPage" Title="Trips" />
+        <ShellContent x:Name="CustomersShell" Route="CustomersPage" Title="Customers" />
+        <ShellContent x:Name="TrackingShell" Route="TrackingPage" Title="Tracking" />
+        <ShellContent x:Name="SettingsShell" Route="SettingsPage" Title="Settings" />
     </TabBar>
 
 </Shell>

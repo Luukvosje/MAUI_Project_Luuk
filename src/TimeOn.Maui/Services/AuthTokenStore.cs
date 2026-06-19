@@ -31,7 +31,7 @@ public sealed class AuthTokenStore : IAuthTokenStore
         catch (Exception exception)
         {
             _logger.LogError(exception, "Failed to save JWT tokens to SecureStorage.");
-            throw new InvalidOperationException("Kon authenticatietokens niet veilig opslaan.", exception);
+            throw new InvalidOperationException("Could not store authentication tokens securely.", exception);
         }
     }
 

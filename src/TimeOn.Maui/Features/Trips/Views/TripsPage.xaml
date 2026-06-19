@@ -5,11 +5,11 @@
              xmlns:vm="clr-namespace:TimeOn.Maui.Features.Trips.ViewModels"
              x:Class="TimeOn.Maui.Features.Trips.Views.TripsPage"
              x:DataType="vm:TripsViewModel"
-             Title="Ritten">
+             Title="Trips">
 
     <Grid Padding="24" RowDefinitions="Auto,Auto,*" RowSpacing="12">
         <VerticalStackLayout Grid.Row="1" Spacing="8">
-            <Button Text="Vernieuwen" Command="{Binding RefreshCommand}" />
+            <Button Text="Refresh" Command="{Binding RefreshCommand}" />
             <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" />
             <Label Text="{Binding ErrorMessage}" Style="{StaticResource ErrorLabel}" />
         </VerticalStackLayout>
@@ -23,7 +23,7 @@
                     <LinearItemsLayout Orientation="Vertical" ItemSpacing="12" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.EmptyView>
-                    <Label Text="Nog geen ritten."
+                    <Label Text="No trips yet."
                            HorizontalOptions="Center"
                            VerticalOptions="Center"
                            Margin="0,40,0,0" />

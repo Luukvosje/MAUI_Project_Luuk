@@ -21,12 +21,12 @@ public sealed class RemoteCustomerService : ICustomerService
         {
             var customers = await _apiService.GetAsync<IReadOnlyList<CustomerDto>>(CustomersEndpoint);
             return customers is null
-                ? Result<IReadOnlyList<CustomerDto>>.Failure(_apiService.LastError ?? "Kon klanten niet laden.")
+                ? Result<IReadOnlyList<CustomerDto>>.Failure(_apiService.LastError ?? "Could not load customers.")
                 : Result<IReadOnlyList<CustomerDto>>.Success(customers);
         }
         catch (Exception)
         {
-            return Result<IReadOnlyList<CustomerDto>>.Failure(_apiService.LastError ?? "Kon klanten niet laden.");
+            return Result<IReadOnlyList<CustomerDto>>.Failure(_apiService.LastError ?? "Could not load customers.");
         }
     }
 
@@ -36,12 +36,12 @@ public sealed class RemoteCustomerService : ICustomerService
         {
             var response = await _apiService.PostAsync<CreateCustomerRequestDto, CustomerDto>(CustomersEndpoint, request);
             return response is null
-                ? Result<CustomerDto>.Failure(_apiService.LastError ?? "Kon klant niet aanmaken.")
+                ? Result<CustomerDto>.Failure(_apiService.LastError ?? "Could not create customer.")
                 : Result<CustomerDto>.Success(response);
         }
         catch (Exception)
         {
-            return Result<CustomerDto>.Failure(_apiService.LastError ?? "Kon klant niet aanmaken.");
+            return Result<CustomerDto>.Failure(_apiService.LastError ?? "Could not create customer.");
         }
     }
 
@@ -51,12 +51,12 @@ public sealed class RemoteCustomerService : ICustomerService
         {
             var response = await _apiService.PutAsync<UpdateCustomerRequestDto, CustomerDto>($"{CustomersEndpoint}/{customerId}", request);
             return response is null
-                ? Result<CustomerDto>.Failure(_apiService.LastError ?? "Kon klant niet bijwerken.")
+                ? Result<CustomerDto>.Failure(_apiService.LastError ?? "Could not update customer.")
                 : Result<CustomerDto>.Success(response);
         }
         catch (Exception)
         {
-            return Result<CustomerDto>.Failure(_apiService.LastError ?? "Kon klant niet bijwerken.");
+            return Result<CustomerDto>.Failure(_apiService.LastError ?? "Could not update customer.");
         }
     }
 
@@ -71,7 +71,7 @@ public sealed class RemoteCustomerService : ICustomerService
         }
         catch (Exception)
         {
-            return Result.Failure(_apiService.LastError ?? "Kon klant niet verwijderen.");
+            return Result.Failure(_apiService.LastError ?? "Could not delete customer.");
         }
     }
 }

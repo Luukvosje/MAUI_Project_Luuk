@@ -54,7 +54,7 @@ public partial class RegisterViewModel : ObservableObject
             var success = await _authenticationService.RegisterAsync(Name, Email, Password);
             if (!success)
             {
-                ErrorMessage = _authenticationService.ErrorMessage ?? "Registratie mislukt.";
+                ErrorMessage = _authenticationService.ErrorMessage ?? "Registration failed.";
                 return;
             }
 

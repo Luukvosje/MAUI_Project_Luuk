@@ -13,44 +13,44 @@
         <Label Text="{Binding ErrorMessage}"
                Style="{StaticResource ErrorLabel}" />
 
-        <Label Text="Naam"
+        <Label Text="Name"
                Style="{StaticResource SectionTitle}" />
         <Border Style="{StaticResource FormEntryBorder}">
             <Entry Text="{Binding Name}"
-                   Placeholder="Klantnaam" />
+                   Placeholder="Customer name" />
         </Border>
 
-        <Label Text="Contact e-mail"
+        <Label Text="Contact email"
                Style="{StaticResource SectionTitle}"
                Margin="0,8,0,0" />
         <Border Style="{StaticResource FormEntryBorder}">
             <Entry Text="{Binding ContactEmail}"
-                   Placeholder="naam@bedrijf.nl"
+                   Placeholder="you@company.com"
                    Keyboard="Email" />
         </Border>
 
-        <Label Text="Adres"
+        <Label Text="Address"
                Style="{StaticResource SectionTitle}"
                Margin="0,8,0,0" />
         <Border Style="{StaticResource FormEntryBorder}">
             <Entry Text="{Binding Address}"
-                   Placeholder="Straat, plaats" />
+                   Placeholder="Street, city" />
         </Border>
 
         <Grid ColumnDefinitions="*,Auto"
               Margin="0,8,0,0">
-            <Label Text="Actief"
+            <Label Text="Active"
                    Style="{StaticResource SectionTitle}"
                    VerticalOptions="Center" />
             <Switch Grid.Column="1"
                     IsToggled="{Binding IsActive}" />
         </Grid>
 
-        <Button Text="Opslaan"
+        <Button Text="Save"
                 Style="{StaticResource PrimaryButton}"
                 Margin="0,16,0,0"
                 Command="{Binding SaveCommand, Source={x:Reference FormView}}" />
-        <Button Text="Annuleren"
+        <Button Text="Cancel"
                 Style="{StaticResource SecondaryButton}"
                 Command="{Binding CancelCommand, Source={x:Reference FormView}}" />
     </VerticalStackLayout>
