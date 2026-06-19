@@ -17,9 +17,6 @@ internal static class GpsTestData
 
     public static IReadOnlyList<GpsPointDto> SamplePoints => SamplePointsLazy.Value;
 
-    /// <summary>
-    /// GPS trace after <c>GpsSampleEvaluator</c> on driving legs; on-site samples every 30 s with garden wander.
-    /// </summary>
     public static IReadOnlyList<GpsPointDto> EvaluatorSavedPoints => EvaluatorSavedPointsLazy.Value;
 
     public static List<GpsPoint> ToDomainPoints(IReadOnlyList<GpsPointDto> dtos) =>
