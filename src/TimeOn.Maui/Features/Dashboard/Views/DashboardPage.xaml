@@ -130,30 +130,6 @@
                     </VerticalStackLayout>
                 </Border>
 
-                <Border Style="{StaticResource PrimaryActionCard}"
-                        Margin="0,8,0,0"
-                        IsVisible="{Binding ShowStartTrackingCard}">
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="Start tracking"
-                               TextColor="{StaticResource White}"
-                               FontFamily="OpenSansSemibold"
-                               FontSize="18" />
-                        <Label Text="Open the Tracking tab to begin your work day and record trips automatically."
-                               TextColor="{StaticResource White}"
-                               Opacity="0.92"
-                               FontSize="14"
-                               LineBreakMode="WordWrap" />
-                        <BoxView HeightRequest="1"
-                                 Color="{StaticResource White}"
-                                 Opacity="0.25"
-                                 Margin="0,4,0,4" />
-                        <Label Text="Tracking tab below"
-                               TextColor="{StaticResource Secondary}"
-                               FontFamily="OpenSansSemibold"
-                               FontSize="13" />
-                    </VerticalStackLayout>
-                </Border>
-
                 <Border Style="{StaticResource AppCard}">
                     <VerticalStackLayout Spacing="8">
                         <Label Text="Status"

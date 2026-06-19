@@ -19,14 +19,16 @@ TimeOn is een .NET MAUI-app voor consultants, monteurs en accountmanagers die ve
 
 ## Projectstructuur
 
-| Project | Rol |
-|---------|-----|
-| `TimeOn.Maui` | MAUI-app (UI, GPS-tracking, API-client) |
-| `TimeOn.Api` | REST API met Swagger |
-| `TimeOn.Application` | Business logic en services |
-| `TimeOn.Domain` | Domeinmodellen |
-| `TimeOn.Infrastructure` | Database, repositories, JWT |
-| `TimeOn.UnitTests` | Unit tests |
+
+| Project                 | Rol                                     |
+| ----------------------- | --------------------------------------- |
+| `TimeOn.Maui`           | MAUI-app (UI, GPS-tracking, API-client) |
+| `TimeOn.Api`            | REST API met Swagger                    |
+| `TimeOn.Application`    | Business logic en services              |
+| `TimeOn.Domain`         | Domeinmodellen                          |
+| `TimeOn.Infrastructure` | Database, repositories, JWT             |
+| `TimeOn.UnitTests`      | Unit tests                              |
+
 
 Open de solution via `TimeOn.slnx` in Visual Studio of Rider.
 
@@ -37,7 +39,7 @@ Open de solution via `TimeOn.slnx` in Visual Studio of Rider.
 ### 1. Repository klonen en packages herstellen
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Luukvosje/MAUI_Project_Luuk
 cd MAUI_Project_Luuk
 dotnet restore
 ```
@@ -69,6 +71,7 @@ dotnet run --project src/TimeOn.Api
 ```
 
 De API draait op:
+
 - HTTPS: `https://localhost:5001`
 - HTTP: `http://localhost:5000`
 
@@ -78,11 +81,13 @@ Swagger UI: [https://localhost:5001/swagger](https://localhost:5001/swagger)
 
 De API-URL staat in `src/TimeOn.Maui/appsettings.json`:
 
-| Platform | Bestand | Standaard URL |
-|----------|---------|---------------|
-| Windows | `appsettings.json` | `https://localhost:5001/` |
-| Android-emulator | `appsettings.android.json` | `http://10.0.2.2:5000/` |
+
+| Platform                | Bestand                    | Standaard URL                                        |
+| ----------------------- | -------------------------- | ---------------------------------------------------- |
+| Windows                 | `appsettings.json`         | `https://localhost:5001/`                            |
+| Android-emulator        | `appsettings.android.json` | `http://10.0.2.2:5000/`                              |
 | Android fysiek apparaat | `appsettings.android.json` | IP-adres van je PC, bijv. `http://192.168.x.x:5000/` |
+
 
 Zorg dat de API bereikbaar is vanaf het apparaat waarop je de app draait.
 
@@ -126,12 +131,14 @@ Of start `TimeOn.Maui` als startup project in Visual Studio en kies het gewenste
 
 ### Overige functies
 
-| Tabblad | Functie |
-|---------|---------|
-| **Dashboard** | Overzicht van kilometers en statistieken |
-| **Trips** | Lijst van geregistreerde ritten; tik op een rit voor details |
-| **Customers** | Klanten beheren en op de kaart bekijken |
-| **Settings** | GPS-notificaties, development mode (Windows), uitloggen |
+
+| Tabblad       | Functie                                                      |
+| ------------- | ------------------------------------------------------------ |
+| **Dashboard** | Overzicht van kilometers en statistieken                     |
+| **Trips**     | Lijst van geregistreerde ritten; tik op een rit voor details |
+| **Customers** | Klanten beheren en op de kaart bekijken                      |
+| **Settings**  | GPS-notificaties, development mode (Windows), uitloggen      |
+
 
 ### Development mode (Windows)
 
@@ -144,14 +151,3 @@ Schakel **Development mode** in via **Settings**. Op het tabblad **Tracking** ku
 ```bash
 dotnet test tests/TimeOn.UnitTests
 ```
-
----
-
-## Veelvoorkomende problemen
-
-| Probleem | Oplossing |
-|----------|-----------|
-| App kan API niet bereiken (Android) | Controleer of de API draait en of `appsettings.android.json` het juiste IP/URL gebruikt |
-| Databasefouten bij opstarten API | Voer `dotnet ef database update` opnieuw uit |
-| Locatie werkt niet | Controleer locatierechten in apparaatinstellingen |
-| HTTPS-certificaat op Windows | Vertrouw het development-certificaat: `dotnet dev-certs https --trust` |
