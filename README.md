@@ -151,3 +151,4 @@ Schakel **Development mode** in via **Settings**. Op het tabblad **Tracking** ku
 ```bash
 dotnet test tests/TimeOn.UnitTests
 ```
+
